@@ -378,3 +378,14 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .detail-ledger { border: 2px solid var(--ink); }
 .detail-ledger-row { display: flex; }
 .detail-ledger-key { width: 130px; padding: 10px 14px; border-right: 1px solid var(--rule); color: var(--muted); font-size: 10.5px; background: var(--paper-2); display: flex; align-items: center; }
+
+.index-card { background: var(--paper); border: 2px solid var(--ink); box-shadow: var(--shadow); position: relative; }
+.index-card-head { background: var(--orange); color: var(--paper); padding: 10px 20px; }
+.index-card-body { padding: 26px 28px 28px; }
+.index-card-photo-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.index-card-photo { width: 168px; height: 118px; border: 2px solid var(--ink); background: #17120d; flex: 0 0 auto; position: relative; overflow: hidden; }
+.index-card-photo-img { width: 100%; height: 100%; object-fit: contain; }
+.index-card-photo-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; color: rgba(245,240,232,0.5); }
+.index-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; margin-bottom: 20px; }
+@media (max-width: 860px) { .index-card-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .index-card-grid { grid-template-columns: 1fr; } }
