@@ -29,7 +29,8 @@ export function useAuth() {
   }
 
   async function signInWithGoogle() {
-    await neon.auth.signIn.social({ provider: 'google', callbackURL: '/' })
+    const { error } = await neon.auth.signIn.social({ provider: 'google', callbackURL: '/' })
+    if (error) return { error }
   }
 
   async function signOut() {

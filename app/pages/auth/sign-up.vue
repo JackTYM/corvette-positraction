@@ -66,6 +66,10 @@ async function onSubmit() {
 }
 
 async function onGoogle() {
-  await signInWithGoogle()
+  error.value = ''
+  const result = await signInWithGoogle()
+  if (result?.error) {
+    error.value = result.error.message || 'Could not sign in with Google.'
+  }
 }
 </script>
