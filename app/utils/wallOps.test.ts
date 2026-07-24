@@ -1,0 +1,43 @@
+import { describe, it, expect } from 'vitest'
+import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice } from './wallOps'
+import { ARRANGE, type Item } from './catalog'
+
+function item(id: string, year: number): Item {
+  return {
+    id, title: id, sub: '', category: 'DIECAST', generation: '—', year, scale: '', maker: '',
+    acquired: '', pricePaid: 0, value: 0, condition: '', location: '', story: '', featured: false,
+    colorName: '', colorHex: '', imgKey: null,
+  }
+}
+
+describe('caseOffsets', () => {
+  it('returns cumulative starting offsets for each case', () => {
+    expect(caseOffsets([6, 8, 4])).toEqual([0, 6, 14])
+  })
+})
+
+describe('moveInOrder', () => {
+  it('moves an item to a new position, cascading everything after it', () => {
+    expect(moveInOrder(['a', 'b', 'c', 'd'], 'd', 1)).toEqual(['a', 'd', 'b', 'c'])
+  })
+  it('clamps the target position to the array bounds', () => {
+    expect(moveInOrder(['a', 'b'], 'a', 99)).toEqual(['b', 'a'])
+  })
+  it('is a no-op position-wise when the item is dropped where it already is', () => {
+    expect(moveInOrder(['a', 'b', 'c'], 'b', 1)).toEqual(['a', 'b', 'c'])
+  })
+})
+
+describe('fileByComparator', () => {
+  it('inserts the item at the position its comparator value dictates', () => {
+    const byId = { a: item('a', 1963), b: item('b', 1990), new: item('new', 1980) }
+    expect(fileByComparator(['a', 'b'], byId, 'new', ARRANGE.release)).toEqual(['a', 'new', 'b'])
+  })
+})
+
+describe('arrangeSlice', () => {
+  it('sorts only the given slice, leaving items outside it untouched', () => {
+    const byId = { a: item('a', 1990), b: item('b', 1963), c: item('c', 2020), d: item('d', 1950) }
+    expect(arrangeSlice(['a', 'b', 'c', 'd'], byId, 0, 2, ARRANGE.release)).toEqual(['b', 'a', 'c', 'd'])
+  })
+})
