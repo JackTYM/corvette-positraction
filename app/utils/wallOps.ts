@@ -18,10 +18,14 @@ export function moveInOrder(order: string[], itemId: string, targetSeq: number):
 export function fileByComparator(
   order: string[], byId: Record<string, Item>, itemId: string, compare: (a: Item, b: Item) => number,
 ): string[] {
+  // Safe: callers (garage.vue) must filter `order` against `byId` before calling —
+  // dangling ids here would indicate a caller bug, not a data condition to handle silently.
   const item = byId[itemId]!
   const rest = order.filter((id) => id !== itemId)
   let idx = 0
   for (const id of rest) {
+    // Safe: callers (garage.vue) must filter `order` against `byId` before calling —
+    // dangling ids here would indicate a caller bug, not a data condition to handle silently.
     if (compare(byId[id]!, item) <= 0) idx++
     else break
   }
@@ -34,6 +38,8 @@ export function arrangeSlice(
   const before = order.slice(0, start)
   const mid = order.slice(start, start + cap)
   const after = order.slice(start + cap)
+  // Safe: callers (garage.vue) must filter `order` against `byId` before calling —
+  // dangling ids here would indicate a caller bug, not a data condition to handle silently.
   const sortedMid = [...mid].sort((a, b) => compare(byId[a]!, byId[b]!))
   return [...before, ...sortedMid, ...after]
 }
