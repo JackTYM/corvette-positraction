@@ -24,7 +24,11 @@
 import type { Item, Category } from '~/utils/catalog'
 
 const { items, fetchAll } = useItems()
-await fetchAll()
+try {
+  await fetchAll()
+} catch (err) {
+  console.warn('Failed to load items for the Collection page:', err)
+}
 
 const filter = ref<'ALL' | Category>('ALL')
 const cats = computed(() => ['ALL', ...new Set(items.value.map((i) => i.category))] as ('ALL' | Category)[])

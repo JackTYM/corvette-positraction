@@ -17,5 +17,11 @@
 
 <script setup lang="ts">
 const { items, fetchAll } = useItems()
-if (!items.value.length) await fetchAll()
+if (!items.value.length) {
+  try {
+    await fetchAll()
+  } catch (err) {
+    console.warn('Failed to load items for layout/print archive:', err)
+  }
+}
 </script>

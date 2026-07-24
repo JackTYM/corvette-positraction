@@ -62,8 +62,12 @@ import type { WallCase } from '~/composables/useWall'
 
 const { items, fetchAll } = useItems()
 const { wall, fetchWall, saveWall } = useWall()
-if (!items.value.length) await fetchAll()
-await fetchWall()
+try {
+  if (!items.value.length) await fetchAll()
+  await fetchWall()
+} catch (err) {
+  console.warn('Failed to load items/wall for the Garage page:', err)
+}
 
 const cases = computed(() => wall.value.cases)
 const carItems = computed(() => items.value.filter(isCar))

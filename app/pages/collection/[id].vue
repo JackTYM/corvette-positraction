@@ -59,7 +59,13 @@ import { fmtMoney, fmtDate, GENERATIONS, type Generation } from '~/utils/catalog
 const route = useRoute()
 const { items, fetchAll, remove: removeItem } = useItems()
 const { remove: removeImage } = useImageUpload()
-if (!items.value.length) await fetchAll()
+if (!items.value.length) {
+  try {
+    await fetchAll()
+  } catch (err) {
+    console.warn('Failed to load items for the Item Detail page:', err)
+  }
+}
 
 const item = computed(() => items.value.find((i) => i.id === route.params.id) || null)
 

@@ -60,7 +60,11 @@ const { wall, fetchWall } = useWall()
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 
-await Promise.all([fetchAll(), fetchWall()])
+try {
+  await Promise.all([fetchAll(), fetchWall()])
+} catch (err) {
+  console.warn('Failed to load items/wall for the Contents page:', err)
+}
 
 const s = computed(() => stats(items.value))
 const featured = computed(() => items.value.find((i) => i.featured) || items.value[0] || null)
