@@ -149,7 +149,6 @@ async function onSave() {
       uploading.value = true
       const result = await upload(pendingFile.value)
       uploadedKey = result.key
-      uploading.value = false
     }
     const item = await create({
       title: form.title, sub: form.sub || 'Newly catalogued', category: form.category,
@@ -162,6 +161,7 @@ async function onSave() {
     })
     await navigateTo(`/collection/${item.id}`)
   } finally {
+    uploading.value = false
     saving.value = false
   }
 }
