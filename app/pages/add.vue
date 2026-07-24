@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, GENERATIONS, GEN_ORDER, type Category, type Generation } from '~/utils/catalog'
+import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, GENERATIONS, GEN_ORDER, type Category, type Generation, type FieldDef } from '~/utils/catalog'
 
 const { items, create } = useItems()
 const { upload } = useImageUpload()
@@ -172,6 +172,14 @@ function freshAttributes(c: Category): Record<string, unknown> {
   const next: Record<string, unknown> = {}
   for (const f of CATEGORY_FIELDS[c]) next[f.key] = f.type === 'checkbox' ? false : ''
   return next
+}
+
+function coerceAttributesForSave(defs: FieldDef[], attrs: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...attrs }
+  for (const f of defs) {
+    if (f.type === 'number' && out[f.key] !== '' && out[f.key] != null) out[f.key] = Number(out[f.key])
+  }
+  return out
 }
 
 const form = reactive({
@@ -251,13 +259,21 @@ async function onSave() {
       rarity: form.rarity,
       condition: form.condition || 'Not yet assessed', location: form.location || 'Unfiled',
       story: form.story || 'No notes recorded yet.', featured: false,
-      colorName: '', colorHex: '', imgKey: uploadedKey, attributes: form.attributes,
+      colorName: '', colorHex: '', imgKey: uploadedKey, attributes: coerceAttributesForSave(fields.value, form.attributes),
     })
     for (const doc of pendingDocuments.value) {
-      await createDocument(item.id, doc)
+      try {
+        await createDocument(item.id, doc)
+      } catch (err) {
+        console.warn('Failed to attach document after item creation:', err)
+      }
     }
     for (const linkedId of pendingLinks.value) {
-      await createLink(item.id, linkedId)
+      try {
+        await createLink(item.id, linkedId)
+      } catch (err) {
+        console.warn('Failed to create linked entry after item creation:', err)
+      }
     }
     await navigateTo(`/collection/${item.id}`)
   } finally {
