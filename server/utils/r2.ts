@@ -4,6 +4,11 @@ export function makeImageKey(userId: string): string {
   return `${userId}/${crypto.randomUUID()}.webp`
 }
 
+export function makeDocumentKey(userId: string, filename: string): string {
+  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, '_')
+  return `${userId}/docs/${crypto.randomUUID()}-${safe}`
+}
+
 export function isOwnedKey(key: string, userId: string): boolean {
   if (!key || key.includes('..') || key.startsWith('/')) return false
   return key.startsWith(`${userId}/`)
