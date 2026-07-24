@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1784873413459,
+      "tag": "0000_familiar_zarda",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784873420999,
+      "tag": "0001_triggers-and-grants",
+      "breakpoints": true
+    }
+  ]
+}
