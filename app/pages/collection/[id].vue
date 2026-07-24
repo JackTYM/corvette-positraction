@@ -69,7 +69,7 @@ async function onDelete() {
   const imgKey = item.value.imgKey
   await removeItem(item.value.id)
   if (imgKey) {
-    try { await removeImage(imgKey) } catch { /* best-effort image cleanup; orphaned R2 objects are an accepted tradeoff */ }
+    try { await removeImage(imgKey) } catch (err) { console.warn('Failed to remove R2 image after item delete:', err) }
   }
   await navigateTo('/collection')
 }
