@@ -5,7 +5,7 @@ export function makeImageKey(userId: string): string {
 }
 
 export function makeDocumentKey(userId: string, filename: string): string {
-  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, '_')
+  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '_')
   return `${userId}/docs/${crypto.randomUUID()}-${safe}`
 }
 
