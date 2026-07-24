@@ -77,7 +77,8 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 export function hsl(hex: string): { h: number; s: number; l: number } {
-  const [r0, g0, b0] = hexToRgb(hex).map((v) => v / 255)
+  const [r, g, b] = hexToRgb(hex)
+  const r0 = r / 255, g0 = g / 255, b0 = b / 255
   const max = Math.max(r0, g0, b0), min = Math.min(r0, g0, b0), d = max - min
   let h = 0
   if (d !== 0) {
