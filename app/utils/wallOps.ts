@@ -18,11 +18,11 @@ export function moveInOrder(order: string[], itemId: string, targetSeq: number):
 export function fileByComparator(
   order: string[], byId: Record<string, Item>, itemId: string, compare: (a: Item, b: Item) => number,
 ): string[] {
-  const item = byId[itemId]
+  const item = byId[itemId]!
   const rest = order.filter((id) => id !== itemId)
   let idx = 0
   for (const id of rest) {
-    if (compare(byId[id], item) <= 0) idx++
+    if (compare(byId[id]!, item) <= 0) idx++
     else break
   }
   return moveInOrder(order, itemId, idx)
@@ -34,6 +34,6 @@ export function arrangeSlice(
   const before = order.slice(0, start)
   const mid = order.slice(start, start + cap)
   const after = order.slice(start + cap)
-  const sortedMid = [...mid].sort((a, b) => compare(byId[a], byId[b]))
+  const sortedMid = [...mid].sort((a, b) => compare(byId[a]!, byId[b]!))
   return [...before, ...sortedMid, ...after]
 }
