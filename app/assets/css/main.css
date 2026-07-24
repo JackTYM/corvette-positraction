@@ -16,7 +16,7 @@
   --font-cond: 'Oswald', 'Arial Narrow', sans-serif;
   --font-hand: 'Caveat', cursive;
 
-  --halftone: 0.55;
+  --halftone: 0.55; /* 0.55, not the design's 0.5 — matches the prototype's real default */
   --paper-tex: 0.5;
   --gap: 26px;
 }
@@ -101,7 +101,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 800; margin: 0; lin
 .rule-thick { border: none; border-top: 3px solid var(--ink); }
 .rule-thin { border: none; border-top: 1px solid var(--rule); }
 
-.photo-frame {
+.photo-frame { /* replaces the design-time <image-slot> web component */
   background: var(--paper-2);
   display: block;
 }
