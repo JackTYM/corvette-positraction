@@ -13,6 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@neondatabase/neon-js": "^0.6.2-beta",
     "drizzle-orm": "^0.45.2",
     "nuxt": "^4.5.0",
     "vue": "^3.5.40",
