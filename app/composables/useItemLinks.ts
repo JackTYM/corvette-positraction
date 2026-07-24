@@ -21,13 +21,14 @@ export function useItemLinks() {
 
   async function fetchForItem(itemId: string): Promise<ItemLink[]> {
     const [a, b] = await Promise.all([
-      neon.from('item_links').select('*').eq('item_id', itemId),
-      neon.from('item_links').select('*').eq('linked_item_id', itemId),
+      neon.from('item_links').select('*').eq('item_id', itemId).order('created_at', { ascending: true }),
+      neon.from('item_links').select('*').eq('linked_item_id', itemId).order('created_at', { ascending: true }),
     ])
     if (a.error) throw a.error
     if (b.error) throw b.error
     const rows = [...(a.data as LinkRow[]), ...(b.data as LinkRow[])]
-    return rows.map(fromLinkRow)
+    const seen = new Set<string>()
+    return rows.map(fromLinkRow).filter((link) => (seen.has(link.id) ? false : (seen.add(link.id), true)))
   }
 
   async function create(itemId: string, linkedItemId: string): Promise<ItemLink> {
