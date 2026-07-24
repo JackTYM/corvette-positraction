@@ -19,6 +19,9 @@ describe('isOwnedKey', () => {
   it('rejects a key belonging to another user', () => {
     expect(isOwnedKey('user-999/abc.webp', 'user-123')).toBe(false)
   })
+  it('rejects a lookalike prefix that is not the full user segment', () => {
+    expect(isOwnedKey('user-1230/abc.webp', 'user-123')).toBe(false)
+  })
   it('rejects path traversal attempts', () => {
     expect(isOwnedKey('user-123/../user-999/abc.webp', 'user-123')).toBe(false)
   })
