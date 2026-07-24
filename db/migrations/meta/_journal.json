@@ -15,6 +15,20 @@
       "when": 1784873420999,
       "tag": "0001_triggers-and-grants",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784936235227,
+      "tag": "0002_whole_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784936241627,
+      "tag": "0003_item_links_documents_grants",
+      "breakpoints": true
     }
   ]
 }
