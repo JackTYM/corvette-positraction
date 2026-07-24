@@ -28,6 +28,10 @@ export function useAuth() {
     return { data }
   }
 
+  async function signInWithGoogle() {
+    await neon.auth.signIn.social({ provider: 'google', callbackURL: '/' })
+  }
+
   async function signOut() {
     await neon.auth.signOut()
     user.value = null
@@ -39,5 +43,5 @@ export function useAuth() {
     return data?.session?.token ?? null
   }
 
-  return { user, refreshSession, signUp, signIn, signOut, getJwt }
+  return { user, refreshSession, signUp, signIn, signInWithGoogle, signOut, getJwt }
 }

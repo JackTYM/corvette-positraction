@@ -23,6 +23,15 @@
       </div>
     </form>
 
+    <div style="display: flex; align-items: center; gap: 12px; margin: 20px 0;">
+      <span style="flex: 1; border-top: 1px solid var(--rule);" />
+      <span class="kicker" style="color: var(--muted); font-size: 10px;">or</span>
+      <span style="flex: 1; border-top: 1px solid var(--rule);" />
+    </div>
+    <button type="button" class="btn ghost" style="width: 100%; justify-content: center; border-color: var(--ink);" @click="onGoogle">
+      Continue with Google
+    </button>
+
     <p style="font-style: italic; color: var(--muted); font-size: 15px; margin-top: 18px;">
       New here?
       <NuxtLink to="/auth/sign-up" class="link-tab" style="color: var(--orange);">Create an account</NuxtLink>
@@ -33,7 +42,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const { signIn } = useAuth()
+const { signIn, signInWithGoogle } = useAuth()
 const email = ref('')
 const password = ref('')
 const error = ref('')
@@ -49,5 +58,9 @@ async function onSubmit() {
     return
   }
   await navigateTo('/')
+}
+
+async function onGoogle() {
+  await signInWithGoogle()
 }
 </script>
