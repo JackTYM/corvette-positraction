@@ -1,6 +1,7 @@
 <template>
   <div v-if="item" class="wrap" style="padding: 26px 26px 70px;">
     <button class="link-tab no-print" style="color: var(--orange); margin-bottom: 20px; background: none; border: none;" @click="$router.back()">← Back to the Collection</button>
+    <button class="link-tab no-print" style="color: var(--muted); margin-bottom: 20px; margin-left: 16px; background: none; border: none;" @click="onDelete">Remove from Archive</button>
 
     <div class="detail-grid">
       <div>
@@ -56,10 +57,22 @@
 import { fmtMoney, fmtDate, GENERATIONS, type Generation } from '~/utils/catalog'
 
 const route = useRoute()
-const { items, fetchAll } = useItems()
+const { items, fetchAll, remove: removeItem } = useItems()
+const { remove: removeImage } = useImageUpload()
 if (!items.value.length) await fetchAll()
 
 const item = computed(() => items.value.find((i) => i.id === route.params.id) || null)
+
+async function onDelete() {
+  if (!item.value) return
+  if (!window.confirm(`Remove "${item.value.title}" from your archive? This can't be undone.`)) return
+  const imgKey = item.value.imgKey
+  await removeItem(item.value.id)
+  if (imgKey) {
+    try { await removeImage(imgKey) } catch { /* best-effort image cleanup; orphaned R2 objects are an accepted tradeoff */ }
+  }
+  await navigateTo('/collection')
+}
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 
