@@ -319,3 +319,30 @@ input:focus, textarea:focus, select:focus { outline: none; }
   .screen-only { display: none !important; }
   .print-only { display: block !important; }
 }
+
+.sec-tabs { background: var(--paper); border-bottom: 3px solid var(--ink); position: sticky; top: 0; z-index: 50; }
+.mag-tab {
+  flex: 1 1 auto; min-width: 120px; padding: 13px 20px 12px;
+  border-right: 1px solid var(--rule-soft); background: transparent; color: var(--ink);
+  display: flex; flex-direction: column; gap: 5px; align-items: flex-start;
+  transition: background 0.12s; text-align: left; position: relative; text-decoration: none;
+}
+.mag-tab:hover:not(.active) { background: var(--paper-2); }
+.mag-tab.active { background: var(--orange); color: var(--paper); }
+.mag-tab-sec { font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.22em; opacity: 0.72; font-weight: 600; }
+.mag-tab-label { font-family: var(--font-display); font-weight: 800; font-size: clamp(15px, 2vw, 21px); line-height: 0.92; letter-spacing: -0.01em; white-space: nowrap; }
+
+.editorial-card {
+  background: var(--paper); border: 2px solid var(--ink); box-shadow: var(--shadow);
+  cursor: pointer; display: flex; flex-direction: column; text-align: left;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+.editorial-card:hover { transform: translateY(-3px); box-shadow: 0 1px 0 rgba(28,24,20,0.06), 0 26px 40px -22px rgba(28,24,20,0.7); }
+.editorial-card-photo { position: relative; border-bottom: 2px solid var(--ink); background: #17120d; height: 190px; overflow: hidden; }
+.editorial-card-img { width: 100%; height: 100%; object-fit: contain; }
+.editorial-card-placeholder {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; color: var(--muted);
+}
+.editorial-card-body { padding: 15px 16px 17px; display: flex; flex-direction: column; flex: 1; }
+.color-swatch { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--ink); flex: 0 0 auto; display: inline-block; }
