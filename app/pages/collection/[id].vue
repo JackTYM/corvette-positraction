@@ -40,6 +40,7 @@
           </div>
         </div>
 
+        <div class="kicker" style="color: var(--orange); margin: 20px 0 8px;">General</div>
         <div class="detail-ledger">
           <div v-for="([k, v], i) in rows" :key="k" class="detail-ledger-row" :style="{ borderBottom: i < rows.length - 1 ? '1px solid var(--rule)' : 'none' }">
             <div class="kicker detail-ledger-key">{{ k }}</div>
@@ -47,12 +48,15 @@
           </div>
         </div>
 
-        <div v-if="attrRows.length" class="detail-ledger" style="margin-top: 14px;">
-          <div v-for="([k, v], i) in attrRows" :key="k" class="detail-ledger-row" :style="{ borderBottom: i < attrRows.length - 1 ? '1px solid var(--rule)' : 'none' }">
-            <div class="kicker detail-ledger-key">{{ k }}</div>
-            <div style="padding: 10px 14px; font-size: 16px;">{{ v }}</div>
+        <template v-if="attrRows.length">
+          <div class="kicker" style="color: var(--orange); margin: 20px 0 8px;">{{ item.category }} Details</div>
+          <div class="detail-ledger">
+            <div v-for="([k, v], i) in attrRows" :key="k" class="detail-ledger-row" :style="{ borderBottom: i < attrRows.length - 1 ? '1px solid var(--rule)' : 'none' }">
+              <div class="kicker detail-ledger-key">{{ k }}</div>
+              <div style="padding: 10px 14px; font-size: 16px;">{{ v }}</div>
+            </div>
           </div>
-        </div>
+        </template>
 
         <div class="kicker" style="color: var(--orange); margin: 24px 0 8px;">Provenance & Notes</div>
         <p class="dropcap" style="font-size: 17px; line-height: 1.6; margin: 0;">{{ item.story }}</p>

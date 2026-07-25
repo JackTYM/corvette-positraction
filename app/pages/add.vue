@@ -35,6 +35,7 @@
           <input v-model="form.sub" placeholder="e.g. Riverside Red · the one-year-only window" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-style: italic; font-size: 17px;" />
         </label>
 
+        <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">General</div>
         <div class="index-card-grid">
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Category</span>
