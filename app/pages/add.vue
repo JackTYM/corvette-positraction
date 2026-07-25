@@ -52,11 +52,11 @@
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Year *</span>
             <input v-model="form.year" type="number" placeholder="1963" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
-          <label>
+          <label v-if="CAR_CATEGORIES.includes(form.category)">
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Scale / Format</span>
             <input v-model="form.scale" placeholder="1:18" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
-          <label>
+          <label v-if="CAR_CATEGORIES.includes(form.category)">
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Maker / Manufacturer</span>
             <input v-model="form.maker" placeholder="AUTOart" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, GENERATIONS, GEN_ORDER, type Category, type Generation, type FieldDef } from '~/utils/catalog'
+import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, type Category, type Generation, type FieldDef } from '~/utils/catalog'
 
 const { items, create } = useItems()
 const { upload } = useImageUpload()

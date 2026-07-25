@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, type Generation, type Item } from '~/utils/catalog'
+import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CAR_CATEGORIES, type Generation, type Item } from '~/utils/catalog'
 import { otherItemId, type ItemLink } from '~/composables/useItemLinks'
 import type { ItemDocument } from '~/composables/useItemDocuments'
 
@@ -214,11 +214,12 @@ const gain = computed(() => (item.value ? item.value.value - item.value.pricePai
 const rows = computed(() => {
   if (!item.value) return [] as [string, string][]
   const g = item.value.generation !== '—' ? GENERATIONS[item.value.generation as Exclude<Generation, '—'>] : undefined
+  const isCarCategory = CAR_CATEGORIES.includes(item.value.category)
   return [
     ['Year', String(item.value.year)],
     ['Generation', item.value.generation === '—' ? 'Ephemera' : `${item.value.generation} — ${g ? g.name : ''}`],
-    ['Scale / Format', item.value.scale],
-    ['Maker', item.value.maker],
+    ...(isCarCategory ? [['Scale / Format', item.value.scale]] : []),
+    ...(isCarCategory ? [['Maker', item.value.maker]] : []),
     ['Acquired', fmtDate(item.value.acquired)],
     ['Price Paid', fmtMoney(item.value.pricePaid)],
     ['Location', item.value.location],
