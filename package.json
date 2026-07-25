@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "test": "vitest run"
+    "test": "vitest run",
+    "scrape:diecast": "node scripts/scrape-diecast.mjs"
   },
   "dependencies": {
     "@neondatabase/neon-js": "^0.6.2-beta",
@@ -22,6 +23,7 @@
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
+    "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "postgres": "^3.4.9",

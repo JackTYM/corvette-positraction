@@ -35,6 +35,10 @@
           <input v-model="form.sub" placeholder="e.g. Riverside Red · the one-year-only window" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-style: italic; font-size: 17px;" />
         </label>
 
+        <div v-if="form.category === 'DIECAST'" class="no-print" style="margin-bottom: 18px;">
+          <button type="button" class="btn ghost" style="font-size: 12px; padding: 7px 13px; border-color: var(--ink);" @click="openDiecastPicker">🔍 Look up a reference model</button>
+        </div>
+
         <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">General</div>
         <div class="index-card-grid">
           <label>
@@ -167,11 +171,13 @@
     </div>
 
     <SlotPicker v-if="showLinkPicker" title="Link an Entry" empty-message="No other items to link yet." :candidates="linkCandidates" @close="showLinkPicker = false" @pick="addPendingLink" />
+    <DiecastLookupPicker v-if="showDiecastPicker" :models="diecastModels" @close="showDiecastPicker = false" @pick="applyDiecastModel" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Category, type Generation, type FieldDef } from '~/utils/catalog'
+import { useDiecastReference, type DiecastModel } from '~/composables/useDiecastReference'
 
 const { items, create } = useItems()
 const { upload } = useImageUpload()
@@ -255,6 +261,29 @@ function addPendingLink(id: string) {
 }
 function removePendingLink(id: string) {
   pendingLinks.value = pendingLinks.value.filter((x) => x !== id)
+}
+
+const { fetchModels: fetchDiecastModels } = useDiecastReference()
+const showDiecastPicker = ref(false)
+const diecastModels = ref<DiecastModel[]>([])
+
+async function openDiecastPicker() {
+  if (!diecastModels.value.length) {
+    try {
+      diecastModels.value = await fetchDiecastModels('Hot Wheels')
+    } catch (err) {
+      console.warn('Failed to load diecast reference models:', err)
+    }
+  }
+  showDiecastPicker.value = true
+}
+
+function applyDiecastModel(m: DiecastModel) {
+  if (!form.title.trim()) form.title = m.name
+  if (!form.maker.trim()) form.maker = m.manufacturer
+  const referenceLine = `Reference: ${m.sourceUrl}`
+  form.story = form.story.trim() ? `${form.story}\n${referenceLine}` : referenceLine
+  showDiecastPicker.value = false
 }
 
 const valid = computed(() => form.title.trim().length > 0 && String(form.year).trim().length > 0)
