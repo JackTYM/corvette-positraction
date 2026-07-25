@@ -108,7 +108,7 @@
               <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Maker / Manufacturer</span>
               <input v-model="form.maker" placeholder="AUTOart" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
             </label>
-            <label v-for="f in fields" :key="f.key" :style="f.type === 'textarea' ? 'grid-column: 1 / -1;' : ''">
+            <label v-for="f in visibleFields" :key="f.key" :style="f.type === 'textarea' ? 'grid-column: 1 / -1;' : ''">
               <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ f.label }}</span>
               <input v-if="f.type === 'text' || f.type === 'number' || f.type === 'date'" v-model="form.attributes[f.key]" :type="f.type" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
               <textarea v-else-if="f.type === 'textarea'" v-model="form.attributes[f.key]" rows="2" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 6px 2px; font-size: 16.5px; resize: vertical;" />
@@ -175,9 +175,17 @@ function freshAttributes(c: Category): Record<string, unknown> {
   return next
 }
 
+function isFieldVisible(f: FieldDef, attrs: Record<string, unknown>): boolean {
+  return !f.showWhen || attrs[f.showWhen.key] === f.showWhen.equals
+}
+
 function coerceAttributesForSave(defs: FieldDef[], attrs: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...attrs }
   for (const f of defs) {
+    if (!isFieldVisible(f, out)) {
+      out[f.key] = f.type === 'checkbox' ? false : ''
+      continue
+    }
     if (f.type === 'number' && out[f.key] !== '' && out[f.key] != null) out[f.key] = Number(out[f.key])
   }
   return out
@@ -191,6 +199,7 @@ const form = reactive({
   attributes: freshAttributes('DIECAST'),
 })
 const fields = computed(() => CATEGORY_FIELDS[form.category])
+const visibleFields = computed(() => fields.value.filter((f) => isFieldVisible(f, form.attributes)))
 
 watch(() => form.category, (c) => {
   if (!CATEGORY_HAS_GENERATION[c]) form.generation = '—'

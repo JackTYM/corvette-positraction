@@ -75,4 +75,8 @@ describe('CATEGORY_FIELDS', () => {
   it('has no extra fields for Brochure (Year/Generation are common fields)', () => {
     expect(CATEGORY_FIELDS.BROCHURE).toEqual([])
   })
+  it('gates the Diecast Wheel Type free-text field behind the Other / Custom option', () => {
+    const wheelTypeOther = CATEGORY_FIELDS.DIECAST.find((f) => f.key === 'wheelTypeOther')
+    expect(wheelTypeOther?.showWhen).toEqual({ key: 'wheelType', equals: 'Other / Custom' })
+  })
 })

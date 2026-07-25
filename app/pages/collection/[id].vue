@@ -238,6 +238,7 @@ const attrRows = computed<[string, string][]>(() => {
     out.push(['Maker', item.value.maker])
   }
   for (const f of CATEGORY_FIELDS[item.value.category]) {
+    if (f.showWhen && item.value.attributes[f.showWhen.key] !== f.showWhen.equals) continue
     const raw = item.value.attributes[f.key]
     let display: string
     if (f.type === 'checkbox') display = raw ? 'Yes' : 'No'

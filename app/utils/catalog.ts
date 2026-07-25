@@ -129,7 +129,15 @@ export const isCar = (item: Pick<Item,'category'> | null | undefined): boolean =
   !!item && CAR_CATEGORIES.includes(item.category)
 
 export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox'
-export interface FieldDef { key: string; label: string; type: FieldType; options?: string[]; placeholder?: string }
+export interface FieldDef {
+  key: string
+  label: string
+  type: FieldType
+  options?: string[]
+  placeholder?: string
+  /** Only relevant when another field (identified by key) equals a given value — e.g. a "Custom" free-text field that only applies when its paired dropdown is set to "Other / Custom". */
+  showWhen?: { key: string; equals: string }
+}
 
 export const CATEGORY_HAS_GENERATION: Record<Category, boolean> = {
   'DIECAST': true, 'BROCHURE': true, 'ADVERTISEMENT': true, 'BADGE': true, 'PATCH': true,
@@ -150,7 +158,7 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
     { key: 'interiorColor', label: 'Interior Color', type: 'text' },
     { key: 'baseColorMat', label: 'Base Color / Mat', type: 'text' },
     { key: 'wheelType', label: 'Wheel Type', type: 'select', options: ['Redline', 'Real Riders', 'Basic Wheels', '5-Spoke', '5-Dot', 'Chrome', 'Other / Custom'] },
-    { key: 'wheelTypeOther', label: 'Wheel Type (if Other / Custom)', type: 'text' },
+    { key: 'wheelTypeOther', label: 'Wheel Type (if Other / Custom)', type: 'text', showWhen: { key: 'wheelType', equals: 'Other / Custom' } },
     { key: 'looseOrCard', label: 'Loose / On-Card', type: 'select', options: ['Loose', 'On-Card'] },
     { key: 'bodyStyle', label: 'Coupe / Convertible / Roadster', type: 'select', options: ['Coupe', 'Convertible', 'Roadster'] },
     { key: 'driveType', label: 'Drive / Mechanism Type', type: 'select', options: ['Free-Roll', 'Pull Back', 'Pull Forward', 'Radio Controlled', 'IP Chip'] },
