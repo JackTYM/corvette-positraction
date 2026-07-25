@@ -1,0 +1,13 @@
+{
+  "planPath": "docs/superpowers/plans/2026-07-24-diecast-reference-database.md",
+  "tasks": [
+    { "id": 32, "subject": "Task 1: DB schema — diecast_models/diecast_variants, RLS, migration", "status": "pending" },
+    { "id": 33, "subject": "Task 2: Scraper HTML parsing module (pure functions, tested against real fixtures)", "status": "pending" },
+    { "id": 34, "subject": "Task 3: Scraper network + DB-writer script", "status": "pending", "blockedBy": [32, 33] },
+    { "id": 35, "subject": "Task 4: useDiecastReference.ts composable", "status": "pending" },
+    { "id": 36, "subject": "Task 5: Reference catalog pages + picker component + nav", "status": "pending", "blockedBy": [35] },
+    { "id": 37, "subject": "Task 6: Add-form autofill integration", "status": "pending", "blockedBy": [36] },
+    { "id": 38, "subject": "Task 7: Full verification pass (run the real scraper, live smoke test)", "status": "pending", "blockedBy": [32, 33, 34, 35, 36, 37] }
+  ],
+  "lastUpdated": "2026-07-24T00:00:00Z"
+}
