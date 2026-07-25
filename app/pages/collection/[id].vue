@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CAR_CATEGORIES, type Generation, type Item } from '~/utils/catalog'
+import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, type Generation, type Item } from '~/utils/catalog'
 import { otherItemId, type ItemLink } from '~/composables/useItemLinks'
 import type { ItemDocument } from '~/composables/useItemDocuments'
 
@@ -217,13 +217,8 @@ const imageBaseUrl = cfg.public.imageBaseUrl
 const gain = computed(() => (item.value ? item.value.value - item.value.pricePaid : 0))
 const rows = computed(() => {
   if (!item.value) return [] as [string, string][]
-  const g = item.value.generation !== '—' ? GENERATIONS[item.value.generation as Exclude<Generation, '—'>] : undefined
-  const isCarCategory = CAR_CATEGORIES.includes(item.value.category)
   return [
     ['Year', String(item.value.year)],
-    ['Generation', item.value.generation === '—' ? 'Ephemera' : `${item.value.generation} — ${g ? g.name : ''}`],
-    ...(isCarCategory ? [['Scale / Format', item.value.scale]] : []),
-    ...(isCarCategory ? [['Maker', item.value.maker]] : []),
     ['Acquired', fmtDate(item.value.acquired)],
     ['Price Paid', fmtMoney(item.value.pricePaid)],
     ['Location', item.value.location],
@@ -231,16 +226,25 @@ const rows = computed(() => {
   ] as [string, string][]
 })
 
-const attrFields = computed(() => (item.value ? CATEGORY_FIELDS[item.value.category] : []))
 const attrRows = computed<[string, string][]>(() => {
   if (!item.value) return []
-  return attrFields.value.map((f) => {
-    const raw = item.value!.attributes[f.key]
+  const out: [string, string][] = []
+  if (CATEGORY_HAS_GENERATION[item.value.category]) {
+    const g = item.value.generation !== '—' ? GENERATIONS[item.value.generation as Exclude<Generation, '—'>] : undefined
+    out.push(['Generation', item.value.generation === '—' ? 'Ephemera' : `${item.value.generation} — ${g ? g.name : ''}`])
+  }
+  if (CAR_CATEGORIES.includes(item.value.category)) {
+    out.push(['Scale / Format', item.value.scale])
+    out.push(['Maker', item.value.maker])
+  }
+  for (const f of CATEGORY_FIELDS[item.value.category]) {
+    const raw = item.value.attributes[f.key]
     let display: string
     if (f.type === 'checkbox') display = raw ? 'Yes' : 'No'
     else if (f.type === 'date') display = fmtDate(raw as string)
     else display = raw != null && raw !== '' ? String(raw) : '—'
-    return [f.label, display]
-  })
+    out.push([f.label, display])
+  }
+  return out
 })
 </script>

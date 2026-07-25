@@ -43,23 +43,9 @@
               <option v-for="c in categoryKeys" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
-          <label v-if="CATEGORY_HAS_GENERATION[form.category]">
-            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Generation</span>
-            <select v-model="form.generation" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-family: var(--font-cond);">
-              <option v-for="g in genOptions" :key="g" :value="g">{{ g === '—' ? '— (none)' : `${g} · ${GENERATIONS[g as Exclude<typeof g, '—'>].years}` }}</option>
-            </select>
-          </label>
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Year *</span>
             <input v-model="form.year" type="number" placeholder="1963" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
-          </label>
-          <label v-if="CAR_CATEGORIES.includes(form.category)">
-            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Scale / Format</span>
-            <input v-model="form.scale" placeholder="1:18" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
-          </label>
-          <label v-if="CAR_CATEGORIES.includes(form.category)">
-            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Maker / Manufacturer</span>
-            <input v-model="form.maker" placeholder="AUTOart" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Stored At</span>
@@ -105,9 +91,23 @@
           <textarea v-model="form.story" rows="3" placeholder="Where it came from, why it matters, what you won't touch…" style="border-bottom: 1.5px solid var(--rule); padding: 6px 2px; font-size: 16.5px; line-height: 1.5; resize: vertical;" />
         </label>
 
-        <div v-if="fields.length" style="margin-top: 20px;">
+        <div v-if="CATEGORY_HAS_GENERATION[form.category] || CAR_CATEGORIES.includes(form.category) || fields.length" style="margin-top: 20px;">
           <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">{{ form.category }} Details</div>
           <div class="index-card-grid">
+            <label v-if="CATEGORY_HAS_GENERATION[form.category]">
+              <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Generation</span>
+              <select v-model="form.generation" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-family: var(--font-cond);">
+                <option v-for="g in genOptions" :key="g" :value="g">{{ g === '—' ? '— (none)' : `${g} · ${GENERATIONS[g as Exclude<typeof g, '—'>].years}` }}</option>
+              </select>
+            </label>
+            <label v-if="CAR_CATEGORIES.includes(form.category)">
+              <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Scale / Format</span>
+              <input v-model="form.scale" placeholder="1:18" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+            </label>
+            <label v-if="CAR_CATEGORIES.includes(form.category)">
+              <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Maker / Manufacturer</span>
+              <input v-model="form.maker" placeholder="AUTOart" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+            </label>
             <label v-for="f in fields" :key="f.key" :style="f.type === 'textarea' ? 'grid-column: 1 / -1;' : ''">
               <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ f.label }}</span>
               <input v-if="f.type === 'text' || f.type === 'number' || f.type === 'date'" v-model="form.attributes[f.key]" :type="f.type" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
