@@ -42,23 +42,23 @@
               <option v-for="c in categoryKeys" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
-          <label v-if="fieldSet.gen">
+          <label v-if="CATEGORY_HAS_GENERATION[form.category]">
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Generation</span>
             <select v-model="form.generation" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-family: var(--font-cond);">
               <option v-for="g in genOptions" :key="g" :value="g">{{ g === '—' ? '— (none)' : `${g} · ${GENERATIONS[g as Exclude<typeof g, '—'>].years}` }}</option>
             </select>
           </label>
           <label>
-            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ fieldSet.year.l }} *</span>
-            <input v-model="form.year" type="number" :placeholder="fieldSet.year.ph" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Year *</span>
+            <input v-model="form.year" type="number" placeholder="1963" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
           <label>
-            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ fieldSet.scale.l }}</span>
-            <input v-model="form.scale" :placeholder="fieldSet.scale.ph" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Scale / Format</span>
+            <input v-model="form.scale" placeholder="1:18" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
           <label>
-            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ fieldSet.maker.l }}</span>
-            <input v-model="form.maker" :placeholder="fieldSet.maker.ph" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Maker / Manufacturer</span>
+            <input v-model="form.maker" placeholder="AUTOart" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Stored At</span>
@@ -76,6 +76,22 @@
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Est. Value ($)</span>
             <input v-model="form.value" type="number" placeholder="285" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
           </label>
+          <label>
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Value As Of</span>
+            <input v-model="form.valueAsOf" type="date" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+          </label>
+          <label>
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Value Source</span>
+            <input v-model="form.valueSource" placeholder="Hagerty valuation, eBay comp…" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+          </label>
+          <label>
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Production Date</span>
+            <input v-model="form.productionDate" type="date" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+          </label>
+          <label>
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Rarity</span>
+            <RarityStars v-model="form.rarity" editable style="display: block; padding: 8px 2px;" />
+          </label>
         </div>
 
         <label style="display: block; margin-bottom: 18px;">
@@ -87,6 +103,45 @@
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Provenance & Notes</span>
           <textarea v-model="form.story" rows="3" placeholder="Where it came from, why it matters, what you won't touch…" style="border-bottom: 1.5px solid var(--rule); padding: 6px 2px; font-size: 16.5px; line-height: 1.5; resize: vertical;" />
         </label>
+
+        <div v-if="fields.length" style="margin-top: 20px;">
+          <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">{{ form.category }} Details</div>
+          <div class="index-card-grid">
+            <label v-for="f in fields" :key="f.key" :style="f.type === 'textarea' ? 'grid-column: 1 / -1;' : ''">
+              <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ f.label }}</span>
+              <input v-if="f.type === 'text' || f.type === 'number' || f.type === 'date'" v-model="form.attributes[f.key]" :type="f.type" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;" />
+              <textarea v-else-if="f.type === 'textarea'" v-model="form.attributes[f.key]" rows="2" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 6px 2px; font-size: 16.5px; resize: vertical;" />
+              <select v-else-if="f.type === 'select'" v-model="form.attributes[f.key]" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;">
+                <option value="">—</option>
+                <option v-for="opt in f.options" :key="opt" :value="opt">{{ opt }}</option>
+              </select>
+              <span v-else-if="f.type === 'checkbox'" style="display: flex; align-items: center; gap: 6px; padding: 5px 2px;">
+                <input v-model="form.attributes[f.key]" type="checkbox" />
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">Documents</div>
+          <label class="btn ghost no-print" style="cursor: pointer; border-color: var(--ink);">
+            + Attach a Document
+            <input type="file" accept=".pdf,image/*" multiple style="display: none;" @change="onDocFiles" />
+          </label>
+          <div v-for="(d, i) in pendingDocuments" :key="`${d.name}-${i}`" style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+            <span>{{ d.name }}</span>
+            <button class="link-tab" style="color: var(--muted); font-size: 11px; background: none; border: none;" @click="removePendingDocument(i)">remove</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">Linked Entries</div>
+          <button class="btn ghost no-print" type="button" style="border-color: var(--ink);" @click="showLinkPicker = true">+ Link an Entry</button>
+          <div v-for="id in pendingLinks" :key="id" style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+            <span>{{ items.find((i) => i.id === id)?.title }}</span>
+            <button class="link-tab" style="color: var(--muted); font-size: 11px; background: none; border: none;" @click="removePendingLink(id)">remove</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -96,29 +151,50 @@
         {{ saving ? 'Filing…' : '✓ File This Card' }}
       </button>
     </div>
+
+    <SlotPicker v-if="showLinkPicker" title="Link an Entry" empty-message="No other items to link yet." :candidates="linkCandidates" @close="showLinkPicker = false" @pick="addPendingLink" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { FIELD_SETS, CATEGORIES, GENERATIONS, GEN_ORDER, type Category, type Generation } from '~/utils/catalog'
+import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, GENERATIONS, GEN_ORDER, type Category, type Generation, type FieldDef } from '~/utils/catalog'
 
-const { create } = useItems()
+const { items, create } = useItems()
 const { upload } = useImageUpload()
+const { upload: uploadDoc } = useDocumentUpload()
+const { create: createDocument } = useItemDocuments()
+const { create: createLink } = useItemLinks()
 
 const categoryKeys = Object.keys(CATEGORIES) as Category[]
 const genOptions = GEN_ORDER
 
+function freshAttributes(c: Category): Record<string, unknown> {
+  const next: Record<string, unknown> = {}
+  for (const f of CATEGORY_FIELDS[c]) next[f.key] = f.type === 'checkbox' ? false : ''
+  return next
+}
+
+function coerceAttributesForSave(defs: FieldDef[], attrs: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...attrs }
+  for (const f of defs) {
+    if (f.type === 'number' && out[f.key] !== '' && out[f.key] != null) out[f.key] = Number(out[f.key])
+  }
+  return out
+}
+
 const form = reactive({
   title: '', sub: '', category: 'DIECAST' as Category, generation: 'C2' as Generation,
   year: '', scale: '', maker: '', acquired: '', pricePaid: '', value: '',
+  valueAsOf: '', valueSource: '', productionDate: '', rarity: null as number | null,
   condition: '', location: '', story: '',
+  attributes: freshAttributes('DIECAST'),
 })
-const fieldSet = computed(() => FIELD_SETS[form.category])
+const fields = computed(() => CATEGORY_FIELDS[form.category])
 
 watch(() => form.category, (c) => {
-  const fs = FIELD_SETS[c]
-  if (!fs.gen) form.generation = '—'
+  if (!CATEGORY_HAS_GENERATION[c]) form.generation = '—'
   else if (form.generation === '—') form.generation = 'C2'
+  form.attributes = freshAttributes(c)
 })
 
 const pendingFile = ref<File | null>(null)
@@ -138,6 +214,26 @@ function clearPhoto() {
   uploadedKey = null
 }
 
+const pendingDocuments = ref<File[]>([])
+function onDocFiles(e: Event) {
+  const files = Array.from((e.target as HTMLInputElement).files ?? [])
+  pendingDocuments.value.push(...files)
+}
+function removePendingDocument(i: number) {
+  pendingDocuments.value.splice(i, 1)
+}
+
+const pendingLinks = ref<string[]>([])
+const showLinkPicker = ref(false)
+const linkCandidates = computed(() => items.value.filter((i) => !pendingLinks.value.includes(i.id)))
+function addPendingLink(id: string) {
+  pendingLinks.value.push(id)
+  showLinkPicker.value = false
+}
+function removePendingLink(id: string) {
+  pendingLinks.value = pendingLinks.value.filter((x) => x !== id)
+}
+
 const valid = computed(() => form.title.trim().length > 0 && String(form.year).trim().length > 0)
 const saving = ref(false)
 
@@ -155,10 +251,27 @@ async function onSave() {
       generation: form.generation, year: form.year ? Number(form.year) : '',
       scale: form.scale || '—', maker: form.maker || 'Unknown', acquired: form.acquired,
       pricePaid: Number(form.pricePaid) || 0, value: Number(form.value) || 0,
+      valueAsOf: form.valueAsOf, valueSource: form.valueSource, productionDate: form.productionDate,
+      rarity: form.rarity,
       condition: form.condition || 'Not yet assessed', location: form.location || 'Unfiled',
       story: form.story || 'No notes recorded yet.', featured: false,
-      colorName: '', colorHex: '', imgKey: uploadedKey,
+      colorName: '', colorHex: '', imgKey: uploadedKey, attributes: coerceAttributesForSave(fields.value, form.attributes),
     })
+    for (const file of pendingDocuments.value) {
+      try {
+        const uploaded = await uploadDoc(file)
+        await createDocument(item.id, uploaded)
+      } catch (err) {
+        console.warn('Failed to attach document after item creation:', err)
+      }
+    }
+    for (const linkedId of pendingLinks.value) {
+      try {
+        await createLink(item.id, linkedId)
+      } catch (err) {
+        console.warn('Failed to create linked entry after item creation:', err)
+      }
+    }
     await navigateTo(`/collection/${item.id}`)
   } finally {
     uploading.value = false

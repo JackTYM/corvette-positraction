@@ -5,8 +5,9 @@ import { ARRANGE, type Item } from './catalog'
 function item(id: string, year: number): Item {
   return {
     id, title: id, sub: '', category: 'DIECAST', generation: '—', year, scale: '', maker: '',
-    acquired: '', pricePaid: 0, value: 0, condition: '', location: '', story: '', featured: false,
-    colorName: '', colorHex: '', imgKey: null,
+    acquired: '', pricePaid: 0, value: 0, valueAsOf: '', valueSource: '', productionDate: '', rarity: null,
+    condition: '', location: '', story: '', featured: false,
+    colorName: '', colorHex: '', imgKey: null, attributes: {},
   }
 }
 

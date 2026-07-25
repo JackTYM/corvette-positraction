@@ -13,6 +13,8 @@ export interface ItemRow {
   acquired: string | null
   price_paid: string | number | null
   value: string | number | null
+  value_as_of: string | null
+  value_source: string | null
   condition: string | null
   location: string | null
   story: string | null
@@ -20,6 +22,9 @@ export interface ItemRow {
   color_name: string | null
   color_hex: string | null
   img_key: string | null
+  production_date: string | null
+  rarity: number | null
+  attributes: Record<string, unknown> | null
   created_at: string
   updated_at: string
 }
@@ -37,6 +42,8 @@ export function fromRow(row: ItemRow): Item {
     acquired: row.acquired ?? '',
     pricePaid: Number(row.price_paid) || 0,
     value: Number(row.value) || 0,
+    valueAsOf: row.value_as_of ?? '',
+    valueSource: row.value_source ?? '',
     condition: row.condition ?? '',
     location: row.location ?? '',
     story: row.story ?? '',
@@ -44,6 +51,9 @@ export function fromRow(row: ItemRow): Item {
     colorName: row.color_name ?? '',
     colorHex: row.color_hex ?? '',
     imgKey: row.img_key,
+    productionDate: row.production_date ?? '',
+    rarity: row.rarity ?? null,
+    attributes: row.attributes ?? {},
   }
 }
 
@@ -59,6 +69,8 @@ export function toPatch(input: Partial<Item>): Record<string, unknown> {
   if (input.acquired !== undefined) patch.acquired = input.acquired || null
   if (input.pricePaid !== undefined) patch.price_paid = input.pricePaid
   if (input.value !== undefined) patch.value = input.value
+  if (input.valueAsOf !== undefined) patch.value_as_of = input.valueAsOf || null
+  if (input.valueSource !== undefined) patch.value_source = input.valueSource
   if (input.condition !== undefined) patch.condition = input.condition
   if (input.location !== undefined) patch.location = input.location
   if (input.story !== undefined) patch.story = input.story
@@ -66,6 +78,9 @@ export function toPatch(input: Partial<Item>): Record<string, unknown> {
   if (input.colorName !== undefined) patch.color_name = input.colorName
   if (input.colorHex !== undefined) patch.color_hex = input.colorHex
   if (input.imgKey !== undefined) patch.img_key = input.imgKey
+  if (input.productionDate !== undefined) patch.production_date = input.productionDate || null
+  if (input.rarity !== undefined) patch.rarity = input.rarity
+  if (input.attributes !== undefined) patch.attributes = input.attributes
   return patch
 }
 

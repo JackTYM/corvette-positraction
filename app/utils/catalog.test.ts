@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, type Item } from './catalog'
+import { fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, type Item } from './catalog'
 
 function item(overrides: Partial<Item>): Item {
   return {
     id: 'x', title: 'T', sub: '', category: 'DIECAST', generation: 'C2', year: 1963,
     scale: '1:18', maker: 'M', acquired: '2020-01-01', pricePaid: 10, value: 20,
+    valueAsOf: '', valueSource: '', productionDate: '', rarity: null,
     condition: '', location: '', story: '', featured: false,
-    colorName: 'Red', colorHex: '#B11A1A', imgKey: null, ...overrides,
+    colorName: 'Red', colorHex: '#B11A1A', imgKey: null, attributes: {}, ...overrides,
   }
 }
 
@@ -58,11 +59,20 @@ describe('ARRANGE.value', () => {
 })
 
 describe('isCar', () => {
-  it('is true for DIECAST and HOT WHEELS', () => {
+  it('is true for DIECAST and SPECIALTY CAR', () => {
     expect(isCar(item({ category: 'DIECAST' }))).toBe(true)
-    expect(isCar(item({ category: 'HOT WHEELS' }))).toBe(true)
+    expect(isCar(item({ category: 'SPECIALTY CAR' }))).toBe(true)
   })
   it('is false for paper ephemera', () => {
     expect(isCar(item({ category: 'BROCHURE' }))).toBe(false)
+  })
+})
+
+describe('CATEGORY_FIELDS', () => {
+  it('includes the Manufacturer Collector Number field for Diecast', () => {
+    expect(CATEGORY_FIELDS.DIECAST.some((f) => f.key === 'manufacturerCollectorNumber')).toBe(true)
+  })
+  it('has no extra fields for Brochure (Year/Generation are common fields)', () => {
+    expect(CATEGORY_FIELDS.BROCHURE).toEqual([])
   })
 })
