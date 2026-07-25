@@ -12,7 +12,16 @@
           <div style="position: absolute; top: 18px; left: 18px;"><Stamp :category="item.category" /></div>
         </div>
         <div class="detail-condition">
-          <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">Condition Report</div>
+          <div class="kicker" style="color: var(--orange); margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
+            Condition
+            <InfoTooltip v-if="item.category === 'DIECAST'">
+              <div style="font-weight: 700; margin-bottom: 8px;">Grade Scale</div>
+              <p v-for="g in DIECAST_GRADE_SCALE" :key="g.value" style="margin: 0 0 8px;">
+                <strong>{{ gradeLabel(g) }}:</strong> {{ g.description }}
+              </p>
+              <p style="margin: 10px 0 0; font-style: italic; color: var(--muted); font-size: 11.5px;">*{{ DIECAST_GRADE_SCALE_ATTRIBUTION }}</p>
+            </InfoTooltip>
+          </div>
           <p style="margin: 0; font-size: 16px; line-height: 1.5; font-style: italic;">{{ item.condition }}</p>
         </div>
       </div>
@@ -58,7 +67,7 @@
           </div>
         </template>
 
-        <div class="kicker" style="color: var(--orange); margin: 24px 0 8px;">Provenance & Notes</div>
+        <div class="kicker" style="color: var(--orange); margin: 24px 0 8px;">Notes</div>
         <p class="dropcap" style="font-size: 17px; line-height: 1.6; margin: 0;">{{ item.story }}</p>
 
         <div class="no-print" style="margin-top: 24px;">
@@ -93,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, type Generation, type Item } from '~/utils/catalog'
+import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Generation, type Item } from '~/utils/catalog'
 import { otherItemId, type ItemLink } from '~/composables/useItemLinks'
 import type { ItemDocument } from '~/composables/useItemDocuments'
 

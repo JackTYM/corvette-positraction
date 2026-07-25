@@ -82,12 +82,25 @@
         </div>
 
         <label style="display: block; margin-bottom: 18px;">
-          <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Condition Report</span>
-          <input v-model="form.condition" placeholder="Mint · opening doors, hood & decklid" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-style: italic;" />
+          <span class="kicker" style="color: var(--muted); font-size: 10px; display: flex; align-items: center; gap: 5px; margin-bottom: 3px;">
+            Condition
+            <InfoTooltip v-if="form.category === 'DIECAST'">
+              <div style="font-weight: 700; margin-bottom: 8px;">Grade Scale</div>
+              <p v-for="g in DIECAST_GRADE_SCALE" :key="g.value" style="margin: 0 0 8px;">
+                <strong>{{ gradeLabel(g) }}:</strong> {{ g.description }}
+              </p>
+              <p style="margin: 10px 0 0; font-style: italic; color: var(--muted); font-size: 11.5px;">*{{ DIECAST_GRADE_SCALE_ATTRIBUTION }}</p>
+            </InfoTooltip>
+          </span>
+          <select v-if="form.category === 'DIECAST'" v-model="form.condition" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px;">
+            <option value="">Select a grade…</option>
+            <option v-for="g in DIECAST_GRADE_SCALE" :key="g.value" :value="gradeLabel(g)">{{ gradeLabel(g) }}</option>
+          </select>
+          <input v-else v-model="form.condition" placeholder="Mint · opening doors, hood & decklid" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-style: italic;" />
         </label>
 
         <label style="display: block;">
-          <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Provenance & Notes</span>
+          <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Notes</span>
           <textarea v-model="form.story" rows="3" placeholder="Where it came from, why it matters, what you won't touch…" style="border-bottom: 1.5px solid var(--rule); padding: 6px 2px; font-size: 16.5px; line-height: 1.5; resize: vertical;" />
         </label>
 
@@ -158,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, type Category, type Generation, type FieldDef } from '~/utils/catalog'
+import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Category, type Generation, type FieldDef } from '~/utils/catalog'
 
 const { items, create } = useItems()
 const { upload } = useImageUpload()

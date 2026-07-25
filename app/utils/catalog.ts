@@ -236,3 +236,21 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
     { key: 'originalOwner', label: 'Original Owner', type: 'text' },
   ],
 }
+
+export interface GradeLevel { value: string; name: string; description: string }
+export const DIECAST_GRADE_SCALE: GradeLevel[] = [
+  { value: '10', name: 'Gem Mint', description: 'Car is virtually free of any physical defects, slightest tarnished base or engine is a possible allowance. Chrome on wheels is perfect.' },
+  { value: '9.5', name: 'Mint', description: 'Appears to exhibit all attributes of Gem Mint. Upon close inspection may exhibit extreme minor imperfections. Any flaw is barely noticeable, pin chip, extreme slight tone or paint variation. Chrome on wheels nearly perfect.' },
+  { value: '9.0', name: 'NM/Mint', description: 'The car appears mint at first glance. Upon close inspection shows slight imperfections, very minor limited chips. Slightly crooked tampos, a near perfect item. Slight chrome loss on wheels.' },
+  { value: '8.5', name: 'NM', description: 'Slight wear is visible on close inspection. Decals, small light scratches, light toning, wheels show light wear, toning, tires slight bend, etc.' },
+  { value: '8.0', name: 'EX/MT', description: 'Car has visible surface wear or small defects which do not affect overall appeal. Toning can be noticeable. This grade still a nice higher end rating.' },
+  { value: '7.0', name: 'EX', description: 'Surface wear or defects more visible. Played with but not abused. Very noticeable toning, worn wheels, chipping, etc.' },
+  { value: '6.0', name: 'VG/EX', description: 'Exhibits some of the better characteristics of EX, but not enough to earn the grade.' },
+  { value: '5.0', name: 'VG', description: 'Defects evident. More than light chipping. Noticeable scratches and scuffs. Middle of the road grade.' },
+  { value: '4.0', name: 'GD/VG', description: 'Heavy chipping, major defects, cracked tires or windows. Some deem filler grade.' },
+  { value: '3.0', name: 'GD', description: 'Extreme wear, at least 1/2 the paint still exists. Abused condition.' },
+  { value: '2.0', name: 'Fair', description: 'Extreme wear, scuffing, scratches, pitting. Little to no paint, a bit above poor.' },
+  { value: '1.0', name: 'Poor', description: 'Extreme wear, scuffing scratches, pitting, missing parts, basically car exists.' },
+]
+export const DIECAST_GRADE_SCALE_ATTRIBUTION = 'This grade scale was compiled by collectors from RLOL, combines a 10 point system along with a simple system of describing a car as either mint (10) or poor (1).'
+export const gradeLabel = (g: GradeLevel): string => `${g.value} - ${g.name}`
