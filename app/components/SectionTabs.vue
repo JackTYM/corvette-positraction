@@ -16,10 +16,12 @@ const tabs = [
   { id: 'collection', label: 'The Collection', num: '02', to: '/collection' },
   { id: 'garage', label: 'The Garage', num: '03', to: '/garage' },
   { id: 'add', label: 'Index a Find', num: '04', to: '/add' },
+  { id: 'diecast-reference', label: 'Diecast Reference', num: '05', to: '/diecast-reference' },
 ]
 function isActive(id: string): boolean {
   if (id === 'toc') return route.path === '/'
   if (id === 'collection') return route.path.startsWith('/collection')
+  if (id === 'diecast-reference') return route.path.startsWith('/diecast-reference')
   return route.path === `/${id}`
 }
 </script>
