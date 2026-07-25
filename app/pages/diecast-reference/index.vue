@@ -20,7 +20,7 @@
         </NuxtLink>
       </div>
     </div>
-    <p v-if="!loading && models.length === 0" style="font-style: italic; color: var(--muted);">No reference models yet — run the scraper.</p>
+    <p v-if="models.length === 0" style="font-style: italic; color: var(--muted);">No reference models yet — run the scraper.</p>
   </div>
 </template>
 
@@ -29,14 +29,10 @@ import type { DiecastModel } from '~/composables/useDiecastReference'
 
 const { fetchModels } = useDiecastReference()
 const models = ref<DiecastModel[]>([])
-const loading = ref(false)
-loading.value = true
 try {
   models.value = await fetchModels()
 } catch (err) {
   console.warn('Failed to load diecast reference models:', err)
-} finally {
-  loading.value = false
 }
 
 const grouped = computed(() => {
