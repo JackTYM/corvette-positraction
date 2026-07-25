@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "test": "vitest run"
+    "test": "vitest run",
+    "scrape:diecast": "node scripts/scrape-diecast.mjs"
   },
   "dependencies": {
     "@neondatabase/neon-js": "^0.6.2-beta",
