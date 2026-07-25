@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm'
 import {
-  pgTable, uuid, text, integer, smallint, numeric, boolean, date, timestamp, jsonb, index, unique, check,
+  pgTable, uuid, text, integer, smallint, numeric, boolean, date, timestamp, jsonb, index, unique, check, pgPolicy,
 } from 'drizzle-orm/pg-core'
 import { crudPolicy, authenticatedRole, authUid } from 'drizzle-orm/neon'
 
@@ -102,6 +102,46 @@ export const itemDocuments = pgTable(
       role: authenticatedRole,
       read: authUid(table.userId),
       modify: authUid(table.userId),
+    }),
+  ],
+).enableRLS()
+
+export const diecastModels = pgTable(
+  'diecast_models',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    manufacturer: text('manufacturer').notNull(),
+    name: text('name').notNull(),
+    sourceUrl: text('source_url').notNull().unique(),
+    coverImageUrl: text('cover_image_url'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [
+    pgPolicy('diecast_models_select_authenticated', {
+      for: 'select',
+      to: authenticatedRole,
+      using: sql`true`,
+    }),
+  ],
+).enableRLS()
+
+export const diecastVariants = pgTable(
+  'diecast_variants',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    modelId: uuid('model_id').notNull().references(() => diecastModels.id, { onDelete: 'cascade' }),
+    caption: text('caption'),
+    imageUrl: text('image_url').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('diecast_variants_model_id_idx').on(table.modelId),
+    pgPolicy('diecast_variants_select_authenticated', {
+      for: 'select',
+      to: authenticatedRole,
+      using: sql`true`,
     }),
   ],
 ).enableRLS()
