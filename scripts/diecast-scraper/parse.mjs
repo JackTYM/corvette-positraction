@@ -37,8 +37,8 @@ export function parseModelPage(detailHtml, manufacturer) {
     const firstRealImg = row
       .find('img')
       .filter((_, img) => {
-        const src = $(img).attr('src') || ''
-        return !src.includes(PLACEHOLDER_IMAGE)
+        const src = $(img).attr('src')
+        return !!src && !src.includes(PLACEHOLDER_IMAGE)
       })
       .first()
     const src = firstRealImg.attr('src')
