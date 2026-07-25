@@ -1,15 +1,15 @@
 {
   "planPath": "docs/superpowers/plans/2026-07-24-expand-categories-attributes.md",
   "tasks": [
-    { "id": 23, "subject": "Task 1: Database schema — new columns, item_links, item_documents, RLS, migration", "status": "pending" },
-    { "id": 24, "subject": "Task 2: catalog.ts — 16 categories, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION", "status": "pending", "blockedBy": [23] },
-    { "id": 25, "subject": "Task 3: useItems.ts — new columns + attributes passthrough", "status": "pending", "blockedBy": [24] },
-    { "id": 26, "subject": "Task 4: useItemLinks.ts — Linked Entries composable", "status": "pending", "blockedBy": [23] },
-    { "id": 27, "subject": "Task 5: useItemDocuments.ts — Documents composable", "status": "pending", "blockedBy": [23] },
-    { "id": 28, "subject": "Task 6: R2 document key + upload/delete routes + client composable", "status": "pending" },
-    { "id": 29, "subject": "Task 7: add.vue — common fields, dynamic category attributes, Documents, Linked Entries", "status": "pending", "blockedBy": [24, 25, 26, 27, 28] },
-    { "id": 30, "subject": "Task 8: collection/[id].vue — new ledger rows, dynamic attributes, Linked Entries, Documents", "status": "pending", "blockedBy": [29] },
-    { "id": 31, "subject": "Task 9: Full verification pass", "status": "pending", "blockedBy": [23, 24, 25, 26, 27, 28, 29, 30] }
+    { "id": 23, "subject": "Task 1: Database schema — new columns, item_links, item_documents, RLS, migration", "status": "completed" },
+    { "id": 24, "subject": "Task 2: catalog.ts — 16 categories, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION", "status": "completed", "blockedBy": [23] },
+    { "id": 25, "subject": "Task 3: useItems.ts — new columns + attributes passthrough", "status": "completed", "blockedBy": [24] },
+    { "id": 26, "subject": "Task 4: useItemLinks.ts — Linked Entries composable", "status": "completed", "blockedBy": [23] },
+    { "id": 27, "subject": "Task 5: useItemDocuments.ts — Documents composable", "status": "completed", "blockedBy": [23] },
+    { "id": 28, "subject": "Task 6: R2 document key + upload/delete routes + client composable", "status": "completed" },
+    { "id": 29, "subject": "Task 7: add.vue — common fields, dynamic category attributes, Documents, Linked Entries", "status": "completed", "blockedBy": [24, 25, 26, 27, 28] },
+    { "id": 30, "subject": "Task 8: collection/[id].vue — new ledger rows, dynamic attributes, Linked Entries, Documents", "status": "completed", "blockedBy": [29] },
+    { "id": 31, "subject": "Task 9: Full verification pass", "status": "completed", "blockedBy": [23, 24, 25, 26, 27, 28, 29, 30] }
   ],
   "lastUpdated": "2026-07-24T00:00:00Z"
 }
