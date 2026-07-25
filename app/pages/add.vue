@@ -128,8 +128,8 @@
             + Attach a Document
             <input type="file" accept=".pdf,image/*" multiple style="display: none;" @change="onDocFiles" />
           </label>
-          <div v-for="(d, i) in pendingDocuments" :key="d.key" style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
-            <span>{{ d.filename }}</span>
+          <div v-for="(d, i) in pendingDocuments" :key="`${d.name}-${i}`" style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px;">
+            <span>{{ d.name }}</span>
             <button class="link-tab" style="color: var(--muted); font-size: 11px; background: none; border: none;" @click="removePendingDocument(i)">remove</button>
           </div>
         </div>
@@ -214,14 +214,10 @@ function clearPhoto() {
   uploadedKey = null
 }
 
-const pendingDocuments = ref<{ key: string; filename: string; mimeType: string; size: number; url: string }[]>([])
-async function onDocFiles(e: Event) {
+const pendingDocuments = ref<File[]>([])
+function onDocFiles(e: Event) {
   const files = Array.from((e.target as HTMLInputElement).files ?? [])
-  if (!files.length) return
-  for (const file of files) {
-    const result = await uploadDoc(file)
-    pendingDocuments.value.push(result)
-  }
+  pendingDocuments.value.push(...files)
 }
 function removePendingDocument(i: number) {
   pendingDocuments.value.splice(i, 1)
@@ -261,9 +257,10 @@ async function onSave() {
       story: form.story || 'No notes recorded yet.', featured: false,
       colorName: '', colorHex: '', imgKey: uploadedKey, attributes: coerceAttributesForSave(fields.value, form.attributes),
     })
-    for (const doc of pendingDocuments.value) {
+    for (const file of pendingDocuments.value) {
       try {
-        await createDocument(item.id, doc)
+        const uploaded = await uploadDoc(file)
+        await createDocument(item.id, uploaded)
       } catch (err) {
         console.warn('Failed to attach document after item creation:', err)
       }

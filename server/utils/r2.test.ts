@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isOwnedKey, makeImageKey, objectUrl } from './r2'
+import { isOwnedKey, makeDocumentKey, makeImageKey, objectUrl } from './r2'
 
 describe('makeImageKey', () => {
   it('prefixes the key with the user id and a .webp extension', () => {
@@ -9,6 +9,28 @@ describe('makeImageKey', () => {
   })
   it('produces a unique key on each call', () => {
     expect(makeImageKey('user-123')).not.toBe(makeImageKey('user-123'))
+  })
+})
+
+describe('makeDocumentKey', () => {
+  it('prefixes the key with the user id and a docs/ segment', () => {
+    const key = makeDocumentKey('user-123', 'manual.pdf')
+    expect(key.startsWith('user-123/docs/')).toBe(true)
+    expect(key.endsWith('-manual.pdf')).toBe(true)
+  })
+  it('sanitizes characters outside [a-zA-Z0-9._-]', () => {
+    const key = makeDocumentKey('user-123', 'my file (final)!.pdf')
+    expect(key).not.toMatch(/[ ()!]/)
+  })
+  it('collapses runs of 2+ dots so the key never contains ".."', () => {
+    const key = makeDocumentKey('user-123', 'notes...pdf')
+    expect(key).not.toContain('..')
+  })
+  it('strips slashes from the filename so it cannot escape the docs/ prefix', () => {
+    const key = makeDocumentKey('user-123', '../../etc/passwd')
+    expect(key.startsWith('user-123/docs/')).toBe(true)
+    expect(key).not.toContain('..')
+    expect((key.match(/\//g) || []).length).toBe(2)
   })
 })
 
