@@ -6,13 +6,17 @@ const SITE_ORIGIN = 'https://smalldiecastcorvettes.com/'
 const MANUFACTURER = 'Hot Wheels'
 const MANUFACTURER_LIST_URL = `${SITE_ORIGIN}manufac/Hot_Wheels_Corvettes.html`
 const REQUEST_DELAY_MS = 500
+const REQUEST_TIMEOUT_MS = 15_000
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; corvette-positraction-scraper/1.0)' } })
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; corvette-positraction-scraper/1.0)' },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  })
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} fetching ${url}`)
   return res.text()
 }
@@ -36,25 +40,27 @@ async function main() {
         const { variants } = parseModelPage(detailHtml, MANUFACTURER)
         const coverImageUrl = variants[0]?.imageUrl ?? null
 
-        const [model] = await sql`
-          insert into diecast_models (manufacturer, name, source_url, cover_image_url, updated_at)
-          values (${MANUFACTURER}, ${name}, ${sourceUrl}, ${coverImageUrl}, now())
-          on conflict (source_url) do update set
-            name = excluded.name,
-            cover_image_url = excluded.cover_image_url,
-            updated_at = now()
-          returning id
-        `
-
-        await sql`delete from diecast_variants where model_id = ${model.id}`
-        if (variants.length > 0) {
-          await sql`
-            insert into diecast_variants ${sql(
-              variants.map((v) => ({ model_id: model.id, caption: v.caption, image_url: v.imageUrl, sort_order: v.sortOrder })),
-              'model_id', 'caption', 'image_url', 'sort_order',
-            )}
+        await sql.begin(async (tx) => {
+          const [model] = await tx`
+            insert into diecast_models (manufacturer, name, source_url, cover_image_url, updated_at)
+            values (${MANUFACTURER}, ${name}, ${sourceUrl}, ${coverImageUrl}, now())
+            on conflict (source_url) do update set
+              name = excluded.name,
+              cover_image_url = excluded.cover_image_url,
+              updated_at = now()
+            returning id
           `
-        }
+
+          await tx`delete from diecast_variants where model_id = ${model.id}`
+          if (variants.length > 0) {
+            await tx`
+              insert into diecast_variants ${tx(
+                variants.map((v) => ({ model_id: model.id, caption: v.caption, image_url: v.imageUrl, sort_order: v.sortOrder })),
+                'model_id', 'caption', 'image_url', 'sort_order',
+              )}
+            `
+          }
+        })
 
         succeeded++
         console.log(`  ✓ ${name} (${variants.length} variants)`)
