@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, type Item } from './catalog'
+import { fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, extractYearFromName, type Item } from './catalog'
 
 function item(overrides: Partial<Item>): Item {
   return {
@@ -7,7 +7,7 @@ function item(overrides: Partial<Item>): Item {
     scale: '1:18', maker: 'M', acquired: '2020-01-01', pricePaid: 10, value: 20,
     valueAsOf: '', valueSource: '', productionDate: '', rarity: null,
     condition: '', location: '', story: '', featured: false,
-    colorName: 'Red', colorHex: '#B11A1A', imgKey: null, attributes: {}, ...overrides,
+    colorName: 'Red', colorHex: '#B11A1A', imgKey: null, attributes: {}, sourceVariantId: null, ...overrides,
   }
 }
 
@@ -78,5 +78,19 @@ describe('CATEGORY_FIELDS', () => {
   it('gates the Diecast Wheel Type free-text field behind the Other / Custom option', () => {
     const wheelTypeOther = CATEGORY_FIELDS.DIECAST.find((f) => f.key === 'wheelTypeOther')
     expect(wheelTypeOther?.showWhen).toEqual({ key: 'wheelType', equals: 'Other / Custom' })
+  })
+})
+
+describe('extractYearFromName', () => {
+  it('extracts a confident 4-digit year', () => {
+    expect(extractYearFromName('1953 corvette')).toBe(1953)
+    expect(extractYearFromName('1997 corvette')).toBe(1997)
+  })
+  it('returns null for ambiguous 2-digit year-like names', () => {
+    expect(extractYearFromName('63 corvette')).toBeNull()
+    expect(extractYearFromName('09 corvette stingray concept')).toBeNull()
+  })
+  it('returns null when there is no year at all', () => {
+    expect(extractYearFromName('custom corvette')).toBeNull()
   })
 })

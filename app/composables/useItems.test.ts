@@ -7,6 +7,7 @@ const row: ItemRow = {
   price_paid: '95.00', value: '285.00', value_as_of: '2026-01-01', value_source: 'Hagerty',
   condition: 'Mint', location: 'Cabinet A', story: '…',
   featured: false, color_name: 'Riverside Red', color_hex: '#B11A1A', img_key: 'user-1/abc.webp',
+  source_variant_id: null,
   production_date: '1963-06-01', rarity: 2, attributes: { toyNumber: 'HW-12' },
   created_at: '2020-01-01T00:00:00Z', updated_at: '2020-01-01T00:00:00Z',
 }
@@ -19,6 +20,7 @@ describe('fromRow', () => {
       value: 285, valueAsOf: '2026-01-01', valueSource: 'Hagerty', condition: 'Mint',
       location: 'Cabinet A', story: '…', featured: false,
       colorName: 'Riverside Red', colorHex: '#B11A1A', imgKey: 'user-1/abc.webp',
+      sourceVariantId: null,
       productionDate: '1963-06-01', rarity: 2, attributes: { toyNumber: 'HW-12' },
     })
   })
@@ -31,6 +33,9 @@ describe('fromRow', () => {
     expect(mapped.valueAsOf).toBe('')
     expect(mapped.rarity).toBeNull()
     expect(mapped.attributes).toEqual({})
+  })
+  it('preserves a real source_variant_id', () => {
+    expect(fromRow({ ...row, source_variant_id: 'variant-1' }).sourceVariantId).toBe('variant-1')
   })
 })
 
@@ -47,5 +52,8 @@ describe('toPatch', () => {
   it('maps the new common fields and attributes', () => {
     expect(toPatch({ valueAsOf: '2026-01-01', valueSource: 'eBay comp', productionDate: '', rarity: 3, attributes: { redline: true } }))
       .toEqual({ value_as_of: '2026-01-01', value_source: 'eBay comp', production_date: null, rarity: 3, attributes: { redline: true } })
+  })
+  it('maps sourceVariantId to source_variant_id', () => {
+    expect(toPatch({ sourceVariantId: 'variant-1' })).toEqual({ source_variant_id: 'variant-1' })
   })
 })

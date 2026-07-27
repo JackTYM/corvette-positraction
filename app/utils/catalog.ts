@@ -48,10 +48,16 @@ export interface Item {
   colorHex: string
   imgKey: string | null
   attributes: Record<string, unknown>
+  sourceVariantId: string | null
 }
 
 export const fmtMoney = (n: number | null | undefined): string =>
   '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })
+
+export function extractYearFromName(name: string): number | null {
+  const match = name.match(/\b(19|20)\d{2}\b/)
+  return match ? Number(match[0]) : null
+}
 
 export const fmtDate = (iso: string | null | undefined): string => {
   if (!iso) return '—'
