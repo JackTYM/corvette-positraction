@@ -161,8 +161,8 @@
 
     <div class="no-print" style="display: flex; gap: 12px; margin-top: 22px; justify-content: flex-end;">
       <NuxtLink to="/" class="btn ghost">Discard</NuxtLink>
-      <button class="btn primary" :disabled="!valid || saving" :style="{ opacity: valid && !saving ? 1 : 0.45, pointerEvents: valid && !saving ? 'auto' : 'none' }" @click="onSave">
-        {{ saving ? 'Filing…' : '✓ File This Card' }}
+      <button class="btn primary" :disabled="!valid || saving || importingReferencePhoto" :style="{ opacity: valid && !saving && !importingReferencePhoto ? 1 : 0.45, pointerEvents: valid && !saving && !importingReferencePhoto ? 'auto' : 'none' }" @click="onSave">
+        {{ saving ? 'Filing…' : importingReferencePhoto ? 'Importing photo…' : '✓ File This Card' }}
       </button>
     </div>
 
@@ -229,6 +229,7 @@ const route = useRoute()
 const { fetchVariant, fetchModel } = useDiecastReference()
 const { importFromUrl } = useImageUpload()
 const sourceVariantId = ref<string | null>(null)
+const importingReferencePhoto = ref(false)
 
 const fromVariantId = route.query.fromVariant
 if (typeof fromVariantId === 'string') {
@@ -248,7 +249,11 @@ if (typeof fromVariantId === 'string') {
       }
       // Fire-and-forget: don't block page render on the R2 import round-trip. The user
       // already sees the live reference photo via previewUrl above; this swaps in the
-      // imported copy once it lands, without holding up setup().
+      // imported copy once it lands, without holding up setup(). Save is disabled for
+      // the duration (importingReferencePhoto) so the item can't be saved with a null
+      // imgKey while a photo is visibly showing on screen. On failure, previewUrl is
+      // cleared rather than left pointing at a photo that won't actually be persisted.
+      importingReferencePhoto.value = true
       importFromUrl(variant.imageUrl)
         .then((imported) => {
           uploadedKey = imported.key
@@ -256,6 +261,10 @@ if (typeof fromVariantId === 'string') {
         })
         .catch((err) => {
           console.warn('Failed to import reference photo into R2:', err)
+          previewUrl.value = null
+        })
+        .finally(() => {
+          importingReferencePhoto.value = false
         })
     }
   } catch (err) {
