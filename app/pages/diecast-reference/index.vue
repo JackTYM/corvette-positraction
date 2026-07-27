@@ -39,7 +39,8 @@
               <span v-if="addedLookup.get(v.id)" class="btn ghost" style="font-size: 11px; padding: 5px 10px; display: inline-block;">View entry →</span>
             </div>
           </NuxtLink>
-          <div v-if="!addedLookup.get(v.id)" style="padding: 0 12px 12px;">
+          <div v-if="!addedLookup.get(v.id)" class="no-print" style="padding: 0 12px 12px; display: flex; gap: 8px;">
+            <NuxtLink :to="`/add?fromVariant=${v.id}`" class="btn primary" style="font-size: 11px; padding: 5px 10px;">Index</NuxtLink>
             <button
               type="button"
               class="btn ghost"
