@@ -21,33 +21,32 @@
       <div class="kicker" style="color: var(--orange); margin-bottom: 12px;">{{ model.name }}</div>
       <div class="mag-grid">
         <div v-for="v in variantsByModel[model.id] ?? []" :key="v.id" class="editorial-card">
-          <div class="editorial-card-photo photo-frame">
-            <img :src="v.imageUrl" :alt="v.caption || model.name" class="editorial-card-img" />
-            <div
-              v-if="addedLookup.get(v.id)"
-              style="position: absolute; top: 8px; left: 8px; background: var(--ink); color: var(--paper); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 7px; font-family: var(--font-cond);"
-            >
-              {{ addedLookup.get(v.id)?.type === 'collection' ? 'In Collection' : 'In Wishlist' }}
+          <NuxtLink
+            :to="addedLookup.get(v.id) ? (addedLookup.get(v.id)?.type === 'collection' ? `/collection/${addedLookup.get(v.id)?.id}` : `/wishlist/${addedLookup.get(v.id)?.id}`) : `/add?fromVariant=${v.id}`"
+            style="text-decoration: none; color: inherit; display: block;"
+          >
+            <div class="editorial-card-photo photo-frame">
+              <img :src="v.imageUrl" :alt="v.caption || model.name" class="editorial-card-img" />
+              <div
+                v-if="addedLookup.get(v.id)"
+                style="position: absolute; top: 8px; left: 8px; background: var(--ink); color: var(--paper); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 7px; font-family: var(--font-cond);"
+              >
+                {{ addedLookup.get(v.id)?.type === 'collection' ? 'In Collection' : 'In Wishlist' }}
+              </div>
             </div>
-          </div>
-          <div style="padding: 10px 12px; font-size: 13.5px; line-height: 1.4;">
-            <p v-if="v.caption" style="margin: 0 0 8px;">{{ v.caption }}</p>
-            <NuxtLink
-              v-if="addedLookup.get(v.id)"
-              :to="addedLookup.get(v.id)?.type === 'collection' ? `/collection/${addedLookup.get(v.id)?.id}` : `/wishlist/${addedLookup.get(v.id)?.id}`"
+            <div style="padding: 10px 12px; font-size: 13.5px; line-height: 1.4;">
+              <p v-if="v.caption" style="margin: 0 0 8px;">{{ v.caption }}</p>
+              <span v-if="addedLookup.get(v.id)" class="btn ghost" style="font-size: 11px; padding: 5px 10px; display: inline-block;">View entry →</span>
+            </div>
+          </NuxtLink>
+          <div v-if="!addedLookup.get(v.id)" style="padding: 0 12px 12px;">
+            <button
+              type="button"
               class="btn ghost"
-              style="font-size: 11px; padding: 5px 10px; display: inline-block;"
-            >View entry →</NuxtLink>
-            <div v-else style="display: flex; gap: 8px;">
-              <NuxtLink :to="`/add?fromVariant=${v.id}`" class="btn primary" style="font-size: 11px; padding: 5px 10px;">+ Collection</NuxtLink>
-              <button
-                type="button"
-                class="btn ghost"
-                :style="{ fontSize: '11px', padding: '5px 10px', opacity: wishlistBusy.has(v.id) ? 0.5 : 1 }"
-                :disabled="wishlistBusy.has(v.id)"
-                @click="addToWishlist(v, model)"
-              >{{ wishlistBusy.has(v.id) ? 'Adding…' : '+ Wishlist' }}</button>
-            </div>
+              :style="{ fontSize: '11px', padding: '5px 10px', opacity: wishlistBusy.has(v.id) ? 0.5 : 1 }"
+              :disabled="wishlistBusy.has(v.id)"
+              @click="addToWishlist(v, model)"
+            >{{ wishlistBusy.has(v.id) ? 'Adding…' : '+ Wishlist' }}</button>
           </div>
         </div>
       </div>
