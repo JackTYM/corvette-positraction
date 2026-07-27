@@ -224,6 +224,9 @@ const pendingFile = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
 const uploading = ref(false)
 let uploadedKey: string | null = null
+// Set by onFile/clearPhoto so a still-in-flight reference photo import can't clobber
+// a manual photo action the user made while it was running (see importFromUrl below).
+let referencePhotoOverridden = false
 
 const route = useRoute()
 const { fetchVariant, fetchModel } = useDiecastReference()
@@ -256,12 +259,13 @@ if (typeof fromVariantId === 'string') {
       importingReferencePhoto.value = true
       importFromUrl(variant.imageUrl)
         .then((imported) => {
+          if (referencePhotoOverridden) return
           uploadedKey = imported.key
           previewUrl.value = imported.url
         })
         .catch((err) => {
           console.warn('Failed to import reference photo into R2:', err)
-          previewUrl.value = null
+          if (!referencePhotoOverridden) previewUrl.value = null
         })
         .finally(() => {
           importingReferencePhoto.value = false
@@ -275,10 +279,12 @@ if (typeof fromVariantId === 'string') {
 function onFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
+  referencePhotoOverridden = true
   pendingFile.value = file
   previewUrl.value = URL.createObjectURL(file)
 }
 function clearPhoto() {
+  referencePhotoOverridden = true
   pendingFile.value = null
   previewUrl.value = null
   uploadedKey = null
