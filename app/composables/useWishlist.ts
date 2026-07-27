@@ -21,7 +21,7 @@ export interface WishlistItem {
   sourceVariantId: string | null
 }
 
-export function fromRow(row: WishlistItemRow): WishlistItem {
+export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
   return {
     id: row.id,
     title: row.title,
@@ -33,7 +33,7 @@ export function fromRow(row: WishlistItemRow): WishlistItem {
   }
 }
 
-export function toPatch(input: Partial<WishlistItem>): Record<string, unknown> {
+export function wishlistToPatch(input: Partial<WishlistItem>): Record<string, unknown> {
   const patch: Record<string, unknown> = {}
   if (input.title !== undefined) patch.title = input.title
   if (input.estimatedPrice !== undefined) patch.estimated_price = input.estimatedPrice
@@ -54,21 +54,21 @@ export function useWishlist() {
     const { data, error } = await neon.from('wishlist_items').select('*').order('created_at', { ascending: false })
     loading.value = false
     if (error) throw error
-    items.value = (data as WishlistItemRow[]).map(fromRow)
+    items.value = (data as WishlistItemRow[]).map(fromWishlistRow)
   }
 
   async function create(input: Omit<WishlistItem, 'id'>) {
-    const { data, error } = await neon.from('wishlist_items').insert(toPatch(input)).select().single()
+    const { data, error } = await neon.from('wishlist_items').insert(wishlistToPatch(input)).select().single()
     if (error) throw error
-    const item = fromRow(data as WishlistItemRow)
+    const item = fromWishlistRow(data as WishlistItemRow)
     items.value = [item, ...items.value]
     return item
   }
 
   async function update(id: string, patch: Partial<WishlistItem>) {
-    const { data, error } = await neon.from('wishlist_items').update(toPatch(patch)).eq('id', id).select().single()
+    const { data, error } = await neon.from('wishlist_items').update(wishlistToPatch(patch)).eq('id', id).select().single()
     if (error) throw error
-    const updated = fromRow(data as WishlistItemRow)
+    const updated = fromWishlistRow(data as WishlistItemRow)
     items.value = items.value.map((i) => (i.id === id ? updated : i))
     return updated
   }
