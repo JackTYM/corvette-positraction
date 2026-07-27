@@ -246,13 +246,17 @@ if (typeof fromVariantId === 'string') {
         const referenceLine = `Reference: ${model.sourceUrl}`
         form.story = form.story.trim() ? `${form.story}\n${referenceLine}` : referenceLine
       }
-      try {
-        const imported = await importFromUrl(variant.imageUrl)
-        uploadedKey = imported.key
-        previewUrl.value = imported.url
-      } catch (err) {
-        console.warn('Failed to import reference photo into R2:', err)
-      }
+      // Fire-and-forget: don't block page render on the R2 import round-trip. The user
+      // already sees the live reference photo via previewUrl above; this swaps in the
+      // imported copy once it lands, without holding up setup().
+      importFromUrl(variant.imageUrl)
+        .then((imported) => {
+          uploadedKey = imported.key
+          previewUrl.value = imported.url
+        })
+        .catch((err) => {
+          console.warn('Failed to import reference photo into R2:', err)
+        })
     }
   } catch (err) {
     console.warn('Failed to load reference variant for prefill:', err)
