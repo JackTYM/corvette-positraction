@@ -37,6 +37,7 @@ export const items = pgTable(
   },
   (table) => [
     index('items_user_id_idx').on(table.userId, table.createdAt),
+    index('items_source_variant_id_idx').on(table.sourceVariantId),
     check('items_rarity_range', sql`${table.rarity} is null or (${table.rarity} >= 1 and ${table.rarity} <= 3)`),
     crudPolicy({
       role: authenticatedRole,
@@ -163,6 +164,7 @@ export const wishlistItems = pgTable(
   },
   (table) => [
     index('wishlist_items_user_id_idx').on(table.userId, table.createdAt),
+    index('wishlist_items_source_variant_id_idx').on(table.sourceVariantId),
     crudPolicy({
       role: authenticatedRole,
       read: authUid(table.userId),

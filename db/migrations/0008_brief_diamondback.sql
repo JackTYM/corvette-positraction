@@ -1,0 +1,2 @@
+CREATE INDEX "items_source_variant_id_idx" ON "items" USING btree ("source_variant_id");--> statement-breakpoint
+CREATE INDEX "wishlist_items_source_variant_id_idx" ON "wishlist_items" USING btree ("source_variant_id");

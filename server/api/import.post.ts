@@ -28,11 +28,21 @@ export default defineEventHandler(async (event) => {
   if (!sourceRes.ok) {
     throw createError({ statusCode: 502, statusMessage: `Failed to fetch source image: ${sourceRes.status}` })
   }
+  // fetch() follows redirects by default — re-check the final URL so a redirect can't
+  // smuggle the request off the allowed origin after the initial sourceUrl check passed.
+  if (!sourceRes.url.startsWith(SOURCE_ORIGIN)) {
+    throw createError({ statusCode: 400, statusMessage: `Resolved image URL left ${SOURCE_ORIGIN}` })
+  }
 
   const contentType = sourceRes.headers.get('content-type')?.split(';')[0]?.trim() ?? ''
   const ext = ALLOWED_CONTENT_TYPES[contentType]
   if (!ext) {
     throw createError({ statusCode: 400, statusMessage: 'Unsupported image type' })
+  }
+
+  const declaredLength = Number(sourceRes.headers.get('content-length'))
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_BYTES) {
+    throw createError({ statusCode: 400, statusMessage: 'Image too large (max 8MB)' })
   }
 
   const buffer = new Uint8Array(await sourceRes.arrayBuffer())
