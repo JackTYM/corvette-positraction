@@ -30,6 +30,7 @@ export const items = pgTable(
     colorName: text('color_name'),
     colorHex: text('color_hex'),
     imgKey: text('img_key'),
+    sourceVariantId: uuid('source_variant_id').references(() => diecastVariants.id, { onDelete: 'set null' }),
     attributes: jsonb('attributes').notNull().default(sql`'{}'::jsonb`),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -142,6 +143,30 @@ export const diecastVariants = pgTable(
       for: 'select',
       to: authenticatedRole,
       using: sql`true`,
+    }),
+  ],
+).enableRLS()
+
+export const wishlistItems = pgTable(
+  'wishlist_items',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull().default(sql`auth.user_id()`),
+    title: text('title').notNull(),
+    estimatedPrice: numeric('estimated_price', { precision: 12, scale: 2 }),
+    sourceUrl: text('source_url'),
+    notes: text('notes'),
+    imgKey: text('img_key'),
+    sourceVariantId: uuid('source_variant_id').references(() => diecastVariants.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('wishlist_items_user_id_idx').on(table.userId, table.createdAt),
+    crudPolicy({
+      role: authenticatedRole,
+      read: authUid(table.userId),
+      modify: authUid(table.userId),
     }),
   ],
 ).enableRLS()
