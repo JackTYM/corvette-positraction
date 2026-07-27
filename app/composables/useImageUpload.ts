@@ -28,5 +28,15 @@ export function useImageUpload() {
     })
   }
 
-  return { upload, remove }
+  async function importFromUrl(sourceUrl: string): Promise<UploadResult> {
+    const jwt = await getJwt()
+    if (!jwt) throw new Error('Not signed in')
+    return await $fetch<UploadResult>('/api/import', {
+      method: 'POST',
+      body: { sourceUrl },
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+  }
+
+  return { upload, remove, importFromUrl }
 }

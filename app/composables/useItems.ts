@@ -22,6 +22,7 @@ export interface ItemRow {
   color_name: string | null
   color_hex: string | null
   img_key: string | null
+  source_variant_id: string | null
   production_date: string | null
   rarity: number | null
   attributes: Record<string, unknown> | null
@@ -51,6 +52,7 @@ export function fromRow(row: ItemRow): Item {
     colorName: row.color_name ?? '',
     colorHex: row.color_hex ?? '',
     imgKey: row.img_key,
+    sourceVariantId: row.source_variant_id ?? null,
     productionDate: row.production_date ?? '',
     rarity: row.rarity ?? null,
     attributes: row.attributes ?? {},
@@ -78,6 +80,7 @@ export function toPatch(input: Partial<Item>): Record<string, unknown> {
   if (input.colorName !== undefined) patch.color_name = input.colorName
   if (input.colorHex !== undefined) patch.color_hex = input.colorHex
   if (input.imgKey !== undefined) patch.img_key = input.imgKey
+  if (input.sourceVariantId !== undefined) patch.source_variant_id = input.sourceVariantId
   if (input.productionDate !== undefined) patch.production_date = input.productionDate || null
   if (input.rarity !== undefined) patch.rarity = input.rarity
   if (input.attributes !== undefined) patch.attributes = input.attributes

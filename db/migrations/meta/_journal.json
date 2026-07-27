@@ -43,6 +43,34 @@
       "when": 1784946503428,
       "tag": "0005_diecast_reference_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785121228612,
+      "tag": "0006_futuristic_blue_shield",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1785121260031,
+      "tag": "0007_wishlist_items_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785121736450,
+      "tag": "0008_brief_diamondback",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1785121748747,
+      "tag": "0009_wishlist_items_updated_at_trigger",
+      "breakpoints": true
     }
   ]
 }

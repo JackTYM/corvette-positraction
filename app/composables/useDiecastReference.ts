@@ -52,5 +52,11 @@ export function useDiecastReference() {
     return (data as DiecastVariantRow[]).map(fromVariantRow)
   }
 
-  return { fetchModels, fetchModel, fetchVariants }
+  async function fetchVariant(id: string): Promise<DiecastVariant | null> {
+    const { data, error } = await neon.from('diecast_variants').select('*').eq('id', id).maybeSingle()
+    if (error) throw error
+    return data ? fromVariantRow(data as DiecastVariantRow) : null
+  }
+
+  return { fetchModels, fetchModel, fetchVariants, fetchVariant }
 }

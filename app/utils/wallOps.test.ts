@@ -7,7 +7,7 @@ function item(id: string, year: number): Item {
     id, title: id, sub: '', category: 'DIECAST', generation: '—', year, scale: '', maker: '',
     acquired: '', pricePaid: 0, value: 0, valueAsOf: '', valueSource: '', productionDate: '', rarity: null,
     condition: '', location: '', story: '', featured: false,
-    colorName: '', colorHex: '', imgKey: null, attributes: {},
+    colorName: '', colorHex: '', imgKey: null, attributes: {}, sourceVariantId: null,
   }
 }
 

@@ -1,7 +1,7 @@
 import { AwsClient } from 'aws4fetch'
 
-export function makeImageKey(userId: string): string {
-  return `${userId}/${crypto.randomUUID()}.webp`
+export function makeImageKey(userId: string, ext: string = 'webp'): string {
+  return `${userId}/${crypto.randomUUID()}.${ext}`
 }
 
 export function makeDocumentKey(userId: string, filename: string): string {

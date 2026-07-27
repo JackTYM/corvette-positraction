@@ -35,10 +35,6 @@
           <input v-model="form.sub" placeholder="e.g. Riverside Red · the one-year-only window" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-style: italic; font-size: 17px;" />
         </label>
 
-        <div v-if="form.category === 'DIECAST'" class="no-print" style="margin-bottom: 18px;">
-          <button type="button" class="btn ghost" style="font-size: 12px; padding: 7px 13px; border-color: var(--ink);" @click="openDiecastPicker">🔍 Look up a reference model</button>
-        </div>
-
         <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">General</div>
         <div class="index-card-grid">
           <label>
@@ -165,19 +161,17 @@
 
     <div class="no-print" style="display: flex; gap: 12px; margin-top: 22px; justify-content: flex-end;">
       <NuxtLink to="/" class="btn ghost">Discard</NuxtLink>
-      <button class="btn primary" :disabled="!valid || saving" :style="{ opacity: valid && !saving ? 1 : 0.45, pointerEvents: valid && !saving ? 'auto' : 'none' }" @click="onSave">
-        {{ saving ? 'Filing…' : '✓ File This Card' }}
+      <button class="btn primary" :disabled="!valid || saving || importingReferencePhoto" :style="{ opacity: valid && !saving && !importingReferencePhoto ? 1 : 0.45, pointerEvents: valid && !saving && !importingReferencePhoto ? 'auto' : 'none' }" @click="onSave">
+        {{ saving ? 'Filing…' : importingReferencePhoto ? 'Importing photo…' : '✓ File This Card' }}
       </button>
     </div>
 
     <SlotPicker v-if="showLinkPicker" title="Link an Entry" empty-message="No other items to link yet." :candidates="linkCandidates" @close="showLinkPicker = false" @pick="addPendingLink" />
-    <DiecastLookupPicker v-if="showDiecastPicker" :models="diecastModels" @close="showDiecastPicker = false" @pick="applyDiecastModel" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Category, type Generation, type FieldDef } from '~/utils/catalog'
-import { useDiecastReference, type DiecastModel } from '~/composables/useDiecastReference'
+import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, extractYearFromName, type Category, type Generation, type FieldDef } from '~/utils/catalog'
 
 const { items, create } = useItems()
 const { upload } = useImageUpload()
@@ -230,14 +224,67 @@ const pendingFile = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
 const uploading = ref(false)
 let uploadedKey: string | null = null
+// Set by onFile/clearPhoto so a still-in-flight reference photo import can't clobber
+// a manual photo action the user made while it was running (see importFromUrl below).
+let referencePhotoOverridden = false
+
+const route = useRoute()
+const { fetchVariant, fetchModel } = useDiecastReference()
+const { importFromUrl } = useImageUpload()
+const sourceVariantId = ref<string | null>(null)
+const importingReferencePhoto = ref(false)
+
+const fromVariantId = route.query.fromVariant
+if (typeof fromVariantId === 'string') {
+  try {
+    const variant = await fetchVariant(fromVariantId)
+    if (variant) {
+      sourceVariantId.value = variant.id
+      previewUrl.value = variant.imageUrl
+      const model = await fetchModel(variant.modelId)
+      if (model) {
+        if (!form.title.trim()) form.title = model.name
+        if (!form.maker.trim()) form.maker = model.manufacturer
+        const year = extractYearFromName(model.name)
+        if (year && !String(form.year).trim()) form.year = String(year)
+        const referenceLine = `Reference: ${model.sourceUrl}`
+        form.story = form.story.trim() ? `${form.story}\n${referenceLine}` : referenceLine
+      }
+      // Fire-and-forget: don't block page render on the R2 import round-trip. The user
+      // already sees the live reference photo via previewUrl above; this swaps in the
+      // imported copy once it lands, without holding up setup(). Save is disabled for
+      // the duration (importingReferencePhoto) so the item can't be saved with a null
+      // imgKey while a photo is visibly showing on screen. On failure, previewUrl is
+      // cleared rather than left pointing at a photo that won't actually be persisted.
+      importingReferencePhoto.value = true
+      importFromUrl(variant.imageUrl)
+        .then((imported) => {
+          if (referencePhotoOverridden) return
+          uploadedKey = imported.key
+          previewUrl.value = imported.url
+        })
+        .catch((err) => {
+          console.warn('Failed to import reference photo into R2:', err)
+          if (!referencePhotoOverridden) previewUrl.value = null
+        })
+        .finally(() => {
+          importingReferencePhoto.value = false
+        })
+    }
+  } catch (err) {
+    console.warn('Failed to load reference variant for prefill:', err)
+  }
+}
 
 function onFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
+  referencePhotoOverridden = true
   pendingFile.value = file
   previewUrl.value = URL.createObjectURL(file)
 }
 function clearPhoto() {
+  referencePhotoOverridden = true
   pendingFile.value = null
   previewUrl.value = null
   uploadedKey = null
@@ -263,29 +310,6 @@ function removePendingLink(id: string) {
   pendingLinks.value = pendingLinks.value.filter((x) => x !== id)
 }
 
-const { fetchModels: fetchDiecastModels } = useDiecastReference()
-const showDiecastPicker = ref(false)
-const diecastModels = ref<DiecastModel[]>([])
-
-async function openDiecastPicker() {
-  if (!diecastModels.value.length) {
-    try {
-      diecastModels.value = await fetchDiecastModels('Hot Wheels')
-    } catch (err) {
-      console.warn('Failed to load diecast reference models:', err)
-    }
-  }
-  showDiecastPicker.value = true
-}
-
-function applyDiecastModel(m: DiecastModel) {
-  if (!form.title.trim()) form.title = m.name
-  if (!form.maker.trim()) form.maker = m.manufacturer
-  const referenceLine = `Reference: ${m.sourceUrl}`
-  form.story = form.story.trim() ? `${form.story}\n${referenceLine}` : referenceLine
-  showDiecastPicker.value = false
-}
-
 const valid = computed(() => form.title.trim().length > 0 && String(form.year).trim().length > 0)
 const saving = ref(false)
 
@@ -307,7 +331,7 @@ async function onSave() {
       rarity: form.rarity,
       condition: form.condition || 'Not yet assessed', location: form.location || 'Unfiled',
       story: form.story || 'No notes recorded yet.', featured: false,
-      colorName: '', colorHex: '', imgKey: uploadedKey, attributes: coerceAttributesForSave(fields.value, form.attributes),
+      colorName: '', colorHex: '', imgKey: uploadedKey, sourceVariantId: sourceVariantId.value, attributes: coerceAttributesForSave(fields.value, form.attributes),
     })
     for (const file of pendingDocuments.value) {
       try {
