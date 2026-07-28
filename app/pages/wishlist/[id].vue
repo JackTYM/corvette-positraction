@@ -11,7 +11,10 @@
     </div>
 
     <p v-if="item.estimatedPrice > 0" style="font-size: 18px; margin: 0 0 10px;">Estimated: {{ fmtMoney(item.estimatedPrice) }}</p>
-    <a v-if="item.sourceUrl" :href="item.sourceUrl" target="_blank" rel="noopener" class="btn ghost" style="display: inline-flex; margin-bottom: 14px;">View source →</a>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;">
+      <a v-if="item.sourceUrl" :href="item.sourceUrl" target="_blank" rel="noopener" class="btn ghost" style="display: inline-flex;">View source →</a>
+      <NuxtLink :to="`/add?fromWishlist=${item.id}`" class="btn primary no-print" style="display: inline-flex;">I Bought This — Index It</NuxtLink>
+    </div>
     <p v-if="item.notes" style="font-style: italic; line-height: 1.5;">{{ item.notes }}</p>
   </div>
   <div v-else class="wrap" style="padding: 60px 26px;">

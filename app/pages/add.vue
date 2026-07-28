@@ -1,8 +1,8 @@
 <template>
   <div class="wrap" style="padding: 34px 26px 70px; max-width: 920px;">
     <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section Three</div>
-    <h2 style="font-size: clamp(34px, 6vw, 60px); line-height: 0.9; margin-bottom: 6px;">Index a New Find</h2>
-    <p style="font-style: italic; color: var(--muted); font-size: 16.5px; margin: 0 0 24px;">Fill out the card the way you'd file it in the steel drawer.</p>
+    <h2 style="font-size: clamp(34px, 6vw, 60px); line-height: 0.9; margin-bottom: 6px;">{{ editingItemId ? 'Edit This Card' : 'Index a New Find' }}</h2>
+    <p style="font-style: italic; color: var(--muted); font-size: 16.5px; margin: 0 0 24px;">{{ editingItemId ? 'Update the card on file.' : "Fill out the card the way you'd file it in the steel drawer." }}</p>
 
     <div class="index-card">
       <div class="index-card-head">
@@ -162,7 +162,7 @@
     <div class="no-print" style="display: flex; gap: 12px; margin-top: 22px; justify-content: flex-end;">
       <NuxtLink to="/" class="btn ghost">Discard</NuxtLink>
       <button class="btn primary" :disabled="!valid || saving || importingReferencePhoto" :style="{ opacity: valid && !saving && !importingReferencePhoto ? 1 : 0.45, pointerEvents: valid && !saving && !importingReferencePhoto ? 'auto' : 'none' }" @click="onSave">
-        {{ saving ? 'Filing…' : importingReferencePhoto ? 'Importing photo…' : '✓ File This Card' }}
+        {{ saving ? 'Filing…' : importingReferencePhoto ? 'Importing photo…' : editingItemId ? '✓ Save Changes' : '✓ File This Card' }}
       </button>
     </div>
 
@@ -171,13 +171,15 @@
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, extractYearFromName, type Category, type Generation, type FieldDef } from '~/utils/catalog'
+import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, extractYearFromName, type Category, type Generation, type FieldDef, type Item } from '~/utils/catalog'
 
-const { items, create } = useItems()
+const { items, fetchAll: fetchAllItems, create, update } = useItems()
 const { upload } = useImageUpload()
 const { upload: uploadDoc } = useDocumentUpload()
 const { create: createDocument } = useItemDocuments()
 const { create: createLink } = useItemLinks()
+const { items: wishlistItemsForConvert, fetchAll: fetchWishlistItemsForConvert, remove: removeConvertedWishlistItem } = useWishlist()
+const cfg = useRuntimeConfig()
 
 const categoryKeys = Object.keys(CATEGORIES) as Category[]
 const genOptions = GEN_ORDER
@@ -233,6 +235,7 @@ const { fetchVariant, fetchModel } = useDiecastReference()
 const { importFromUrl } = useImageUpload()
 const sourceVariantId = ref<string | null>(null)
 const importingReferencePhoto = ref(false)
+const fromWishlistId = ref<string | null>(null)
 
 const fromVariantId = route.query.fromVariant
 if (typeof fromVariantId === 'string') {
@@ -273,6 +276,72 @@ if (typeof fromVariantId === 'string') {
     }
   } catch (err) {
     console.warn('Failed to load reference variant for prefill:', err)
+  }
+}
+
+const fromWishlistQuery = route.query.fromWishlist
+if (typeof fromWishlistQuery === 'string') {
+  try {
+    if (!wishlistItemsForConvert.value.length) await fetchWishlistItemsForConvert()
+    const wishlistItem = wishlistItemsForConvert.value.find((w) => w.id === fromWishlistQuery)
+    if (wishlistItem) {
+      fromWishlistId.value = wishlistItem.id
+      sourceVariantId.value = wishlistItem.sourceVariantId
+      if (!form.title.trim()) form.title = wishlistItem.title
+      if (!String(form.value).trim() && wishlistItem.estimatedPrice > 0) form.value = String(wishlistItem.estimatedPrice)
+      if (wishlistItem.notes.trim()) {
+        form.story = form.story.trim() ? `${form.story}\n${wishlistItem.notes}` : wishlistItem.notes
+      }
+      // Already in R2 from the wishlist entry (either a manual upload or an earlier
+      // reference import) -- reuse the key directly, no need to re-import.
+      if (wishlistItem.imgKey) {
+        uploadedKey = wishlistItem.imgKey
+        previewUrl.value = `${cfg.public.imageBaseUrl}/${wishlistItem.imgKey}`
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load wishlist entry for conversion:', err)
+  }
+}
+
+const editingItemId = ref<string | null>(null)
+const editQuery = route.query.edit
+if (typeof editQuery === 'string') {
+  try {
+    if (!items.value.length) await fetchAllItems()
+    const existing = items.value.find((i) => i.id === editQuery)
+    if (existing) {
+      editingItemId.value = existing.id
+      form.title = existing.title
+      form.sub = existing.sub
+      form.category = existing.category
+      // form.category's watcher resets generation/attributes to category defaults --
+      // wait for that to flush, then overwrite with the item's real saved values so
+      // editing doesn't silently blank out its category-specific fields.
+      await nextTick()
+      form.generation = existing.generation
+      form.year = String(existing.year)
+      form.scale = existing.scale
+      form.maker = existing.maker
+      form.acquired = existing.acquired
+      form.pricePaid = String(existing.pricePaid)
+      form.value = String(existing.value)
+      form.valueAsOf = existing.valueAsOf
+      form.valueSource = existing.valueSource
+      form.productionDate = existing.productionDate
+      form.rarity = existing.rarity
+      form.condition = existing.condition
+      form.location = existing.location
+      form.story = existing.story
+      form.attributes = { ...freshAttributes(existing.category), ...existing.attributes }
+      sourceVariantId.value = existing.sourceVariantId
+      if (existing.imgKey) {
+        uploadedKey = existing.imgKey
+        previewUrl.value = `${cfg.public.imageBaseUrl}/${existing.imgKey}`
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load item for editing:', err)
   }
 }
 
@@ -322,7 +391,7 @@ async function onSave() {
       const result = await upload(pendingFile.value)
       uploadedKey = result.key
     }
-    const item = await create({
+    const payload: Partial<Item> = {
       title: form.title, sub: form.sub || 'Newly catalogued', category: form.category,
       generation: form.generation, year: form.year ? Number(form.year) : '',
       scale: form.scale || '—', maker: form.maker || 'Unknown', acquired: form.acquired,
@@ -330,9 +399,18 @@ async function onSave() {
       valueAsOf: form.valueAsOf, valueSource: form.valueSource, productionDate: form.productionDate,
       rarity: form.rarity,
       condition: form.condition || 'Not yet assessed', location: form.location || 'Unfiled',
-      story: form.story || 'No notes recorded yet.', featured: false,
-      colorName: '', colorHex: '', imgKey: uploadedKey, sourceVariantId: sourceVariantId.value, attributes: coerceAttributesForSave(fields.value, form.attributes),
-    })
+      story: form.story || 'No notes recorded yet.',
+      imgKey: uploadedKey, sourceVariantId: sourceVariantId.value, attributes: coerceAttributesForSave(fields.value, form.attributes),
+    }
+    if (!editingItemId.value) {
+      // Only relevant on create -- editing must not reset these to blank/false.
+      payload.featured = false
+      payload.colorName = ''
+      payload.colorHex = ''
+    }
+    const item = editingItemId.value
+      ? await update(editingItemId.value, payload)
+      : await create(payload as Omit<Item, 'id'>)
     for (const file of pendingDocuments.value) {
       try {
         const uploaded = await uploadDoc(file)
@@ -346,6 +424,15 @@ async function onSave() {
         await createLink(item.id, linkedId)
       } catch (err) {
         console.warn('Failed to create linked entry after item creation:', err)
+      }
+    }
+    if (fromWishlistId.value) {
+      try {
+        // Remove the wishlist row only -- its R2 photo (if any) is now reused by the
+        // new item above via uploadedKey, so it must not be deleted here.
+        await removeConvertedWishlistItem(fromWishlistId.value)
+      } catch (err) {
+        console.warn('Failed to remove the source wishlist entry after indexing it:', err)
       }
     }
     await navigateTo(`/collection/${item.id}`)
