@@ -135,16 +135,6 @@ input, textarea, select {
 }
 input:focus, textarea:focus, select:focus { outline: none; }
 
-.dropcap::first-letter {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 3.4em;
-  line-height: 0.72;
-  float: left;
-  margin: 6px 10px 0 0;
-  color: var(--orange);
-}
-
 .toc-line { transition: color 0.1s, padding-left 0.12s; }
 .toc-line:hover { color: var(--orange); padding-left: 5px; }
 

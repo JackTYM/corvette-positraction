@@ -1,6 +1,7 @@
 <template>
   <div v-if="item" class="wrap" style="padding: 26px 26px 70px;">
     <button class="link-tab no-print" style="color: var(--orange); margin-bottom: 20px; background: none; border: none;" @click="$router.back()">← Back to the Collection</button>
+    <NuxtLink :to="`/add?edit=${item.id}`" class="link-tab no-print" style="color: var(--muted); margin-bottom: 20px; margin-left: 16px; display: inline-block;">Edit</NuxtLink>
     <button class="link-tab no-print" style="color: var(--muted); margin-bottom: 20px; margin-left: 16px; background: none; border: none;" @click="onDelete">Remove from Archive</button>
 
     <div class="detail-grid">
@@ -68,7 +69,7 @@
         </template>
 
         <div class="kicker" style="color: var(--orange); margin: 24px 0 8px;">Notes</div>
-        <p class="dropcap" style="font-size: 17px; line-height: 1.6; margin: 0;">{{ item.story }}</p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0;">{{ item.story }}</p>
 
         <div class="no-print" style="margin-top: 24px;">
           <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Linked Entries</div>
