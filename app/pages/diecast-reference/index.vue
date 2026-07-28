@@ -36,7 +36,7 @@
             </div>
             <div style="padding: 10px 12px; font-size: 13.5px; line-height: 1.4;">
               <p v-if="v.caption" style="margin: 0 0 8px;">{{ v.caption }}</p>
-              <span v-if="addedLookup.get(v.id)" class="btn ghost" style="font-size: 11px; padding: 5px 10px; display: inline-block;">View entry →</span>
+              <span v-if="addedLookup.get(v.id)" class="btn ghost" style="font-size: 11px; padding: 5px 10px; display: inline-block;">{{ addedLookup.get(v.id)?.type === 'collection' ? 'View Collection →' : 'View Wishlist →' }}</span>
             </div>
           </NuxtLink>
           <div v-if="!addedLookup.get(v.id)" class="no-print" style="padding: 0 12px 12px; display: flex; gap: 8px;">
@@ -58,6 +58,7 @@
 
 <script setup lang="ts">
 import type { DiecastModel, DiecastVariant } from '~/composables/useDiecastReference'
+import { extractYearFromName } from '~/utils/catalog'
 
 const { fetchModels, fetchVariants } = useDiecastReference()
 const { items: collectionItems, fetchAll: fetchCollectionItems } = useItems()
@@ -96,7 +97,28 @@ watch(manufacturers, (list) => {
   if (!activeManufacturer.value && list.length) activeManufacturer.value = list[0]!
 }, { immediate: true })
 
-const modelsForActiveTab = computed(() => models.value.filter((m) => m.manufacturer === activeManufacturer.value))
+// A best-effort chronological sort for browsing, not a data-integrity concern like the
+// Add form's prefill -- unlike extractYearFromName (catalog.ts), this also resolves
+// 2-digit years using a pivot (<=30 -> 20xx, else 19xx), which correctly covers every
+// 2-digit year actually seen in the scraped names (e.g. "09"/"11"/"12"/"14" -> 2000s,
+// "62".."82" -> 1900s) since real Corvette generations don't collide across that pivot.
+// Worst case for a name we truly can't parse is it sorts to the end, not wrong data.
+function estimateYearForSort(name: string): number {
+  const fourDigit = extractYearFromName(name)
+  if (fourDigit) return fourDigit
+  const twoDigit = name.match(/\b\d{2}\b/)
+  if (twoDigit) {
+    const n = Number(twoDigit[0])
+    return n <= 30 ? 2000 + n : 1900 + n
+  }
+  return 9999
+}
+
+const modelsForActiveTab = computed(() =>
+  models.value
+    .filter((m) => m.manufacturer === activeManufacturer.value)
+    .sort((a, b) => estimateYearForSort(a.name) - estimateYearForSort(b.name)),
+)
 
 watch(modelsForActiveTab, async (modelsInTab) => {
   const toFetch = modelsInTab.filter((m) => !fetchedModelIds.has(m.id))
