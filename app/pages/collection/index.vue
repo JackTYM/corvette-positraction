@@ -27,11 +27,17 @@
           </label>
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Maker</span>
-            <input v-model="topLevel.maker" placeholder="AUTOart" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px;" />
+            <select v-model="topLevel.maker" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px; font-family: var(--font-cond);">
+              <option value="">Any</option>
+              <option v-for="opt in makerOptions" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
           </label>
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Condition</span>
-            <input v-model="topLevel.condition" placeholder="Mint" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px;" />
+            <select v-model="topLevel.condition" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px; font-family: var(--font-cond);">
+              <option value="">Any</option>
+              <option v-for="opt in conditionOptions" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
           </label>
           <label>
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Rarity (min)</span>
@@ -56,7 +62,10 @@
 
           <label v-for="f in visibleFilterFields" :key="f.key" :style="f.type === 'textarea' ? 'grid-column: 1 / -1;' : ''">
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">{{ f.label }}</span>
-            <input v-if="f.type === 'text'" v-model="(attributeFilters[f.key] as string)" type="text" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px;" />
+            <select v-if="f.type === 'text'" v-model="(attributeFilters[f.key] as string)" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px;">
+              <option value="">Any</option>
+              <option v-for="opt in attributeOptions[f.key]" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
             <textarea v-else-if="f.type === 'textarea'" v-model="(attributeFilters[f.key] as string)" rows="2" :placeholder="f.placeholder" style="border-bottom: 1.5px solid var(--rule); padding: 6px 2px; font-size: 15px; resize: vertical;" />
             <select v-else-if="f.type === 'select'" v-model="(attributeFilters[f.key] as string)" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 15px;">
               <option value="">Any</option>
@@ -108,6 +117,23 @@ const categoryFields = computed<FieldDef[]>(() => (filter.value === 'ALL' ? [] :
 
 const attributeFilters = ref<Record<string, AttributeFilterValue>>(freshAttributeFilters(categoryFields.value))
 const topLevel = ref(emptyTopLevelFilters())
+
+// Dropdowns for free-text fields are populated from values that actually appear in the
+// current category's items, rather than left as freeform input -- there's no value in
+// letting someone type a maker/color that doesn't exist in their own collection.
+const itemsInCategory = computed(() => (filter.value === 'ALL' ? [] : items.value.filter((i) => i.category === filter.value)))
+function distinctValues(values: (string | undefined)[]): string[] {
+  return [...new Set(values.filter((v): v is string => !!v?.trim()))].sort()
+}
+const makerOptions = computed(() => distinctValues(itemsInCategory.value.map((i) => i.maker)))
+const conditionOptions = computed(() => distinctValues(itemsInCategory.value.map((i) => i.condition)))
+const attributeOptions = computed(() => {
+  const map: Record<string, string[]> = {}
+  for (const f of categoryFields.value) {
+    if (f.type === 'text') map[f.key] = distinctValues(itemsInCategory.value.map((i) => i.attributes[f.key] as string | undefined))
+  }
+  return map
+})
 
 function isFilterFieldVisible(f: FieldDef): boolean {
   return !f.showWhen || attributeFilters.value[f.showWhen.key] === f.showWhen.equals
