@@ -1,6 +1,6 @@
 <template>
   <div class="screen-only">
-    <Masthead />
+    <Masthead minimal />
     <slot />
     <footer style="border-top: 3px solid var(--ink); margin-top: 30px;">
       <HalftoneBand color="var(--ink)" :height="8" opacity="calc(var(--halftone) * 0.5)" />
