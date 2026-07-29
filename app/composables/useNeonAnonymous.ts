@@ -1,6 +1,8 @@
-// Public/anonymous-capable client — for the public share views only. Never use this for
-// private, session-scoped pages: unlike useNeon(), it silently falls back to an anonymous
-// request instead of failing when there's no session (see neon-anonymous.client.ts).
+// Always-anonymous client — for the public share views only. Unlike useNeon(), it never
+// reads or falls back to the browser's real session JWT, even if the visitor happens to be
+// logged in as some other account: it fetches its own anonymous token directly and ignores
+// session state entirely (see neon-anonymous.client.ts). Never use this for private,
+// session-scoped pages — it can't authenticate as a real user.
 export function useNeonAnonymous() {
   return useNuxtApp().$neonAnonymous
 }
