@@ -8,6 +8,12 @@
       <div style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
         <label style="display: block;">
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Photo</span>
+          <div v-if="previewUrl" style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+            <div class="index-card-photo" style="width: 96px; height: 68px;">
+              <img :src="previewUrl" alt="" class="index-card-photo-img" />
+            </div>
+            <button type="button" class="link-tab" style="color: var(--muted); font-size: 12px; background: none; border: none;" @click="openRecrop">Adjust crop</button>
+          </div>
           <input type="file" accept="image/*" @change="onFile" />
         </label>
         <label style="display: block;">
@@ -32,6 +38,7 @@
         </div>
       </div>
     </div>
+    <ImageCropModal v-if="showCropModal && cropSrc" :src="cropSrc" @close="showCropModal = false" @confirm="onCropConfirm" />
   </div>
 </template>
 
@@ -41,15 +48,49 @@ const { upload } = useImageUpload()
 const { create } = useWishlist()
 
 const pendingFile = ref<File | null>(null)
+const previewUrl = ref<string | null>(null)
 const title = ref('')
 const estimatedPrice = ref('')
 const sourceUrl = ref('')
 const notes = ref('')
 const saving = ref(false)
 
-function onFile(e: Event) {
-  pendingFile.value = (e.target as HTMLInputElement).files?.[0] ?? null
+// Same crop-before-upload flow as add.vue: the picked file goes through ImageCropModal
+// before it ever becomes pendingFile, and the object URL is kept around so "Adjust crop"
+// can re-open it against the original pick rather than the already-cropped result.
+const cropSrc = ref<string | null>(null)
+const showCropModal = ref(false)
+let cropObjectUrl: string | null = null
+
+function revokeIfBlob(url: string | null) {
+  if (url && url.startsWith('blob:')) URL.revokeObjectURL(url)
 }
+function onFile(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  revokeIfBlob(cropObjectUrl)
+  cropObjectUrl = URL.createObjectURL(file)
+  cropSrc.value = cropObjectUrl
+  showCropModal.value = true
+  input.value = ''
+}
+function openRecrop() {
+  if (!cropObjectUrl) return
+  cropSrc.value = cropObjectUrl
+  showCropModal.value = true
+}
+function onCropConfirm(blob: Blob) {
+  revokeIfBlob(previewUrl.value)
+  const cropped = new File([blob], 'cropped.png', { type: blob.type || 'image/png' })
+  pendingFile.value = cropped
+  previewUrl.value = URL.createObjectURL(cropped)
+  showCropModal.value = false
+}
+onBeforeUnmount(() => {
+  revokeIfBlob(cropObjectUrl)
+  revokeIfBlob(previewUrl.value)
+})
 
 async function onSave() {
   if (!title.value.trim() || saving.value) return
