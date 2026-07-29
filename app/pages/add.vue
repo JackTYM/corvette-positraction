@@ -175,6 +175,12 @@
 <script setup lang="ts">
 import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, extractYearFromName, type Category, type Generation, type FieldDef, type Item } from '~/utils/catalog'
 
+// This page's setup logic reads route.query (fromVariant/fromWishlist/edit) once, at the
+// top level, to prefill the form -- forcing a remount on every query change is what makes
+// that logic re-run when navigating between e.g. /add?fromVariant=A and /add?fromVariant=B,
+// which Nuxt would otherwise treat as the same page instance and never re-initialize.
+definePageMeta({ key: (route) => route.fullPath })
+
 const { items, fetchAll: fetchAllItems, create, update } = useItems()
 const { upload } = useImageUpload()
 const { upload: uploadDoc } = useDocumentUpload()
