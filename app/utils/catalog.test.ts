@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, extractYearFromName, type Item } from './catalog'
+import {
+  fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, extractYearFromName, type Item,
+  freshAttributeFilters, matchesAttributeField, matchesAttributeFilters, emptyTopLevelFilters, matchesTopLevelFilters,
+  type FieldDef,
+} from './catalog'
 
 function item(overrides: Partial<Item>): Item {
   return {
@@ -78,6 +82,86 @@ describe('CATEGORY_FIELDS', () => {
   it('gates the Diecast Wheel Type free-text field behind the Other / Custom option', () => {
     const wheelTypeOther = CATEGORY_FIELDS.DIECAST.find((f) => f.key === 'wheelTypeOther')
     expect(wheelTypeOther?.showWhen).toEqual({ key: 'wheelType', equals: 'Other / Custom' })
+  })
+})
+
+describe('freshAttributeFilters', () => {
+  it('gives number/date fields a range shape and everything else an empty string', () => {
+    const fields: FieldDef[] = [
+      { key: 'a', label: 'A', type: 'text' },
+      { key: 'b', label: 'B', type: 'number' },
+      { key: 'c', label: 'C', type: 'date' },
+      { key: 'd', label: 'D', type: 'select', options: ['X'] },
+      { key: 'e', label: 'E', type: 'checkbox' },
+    ]
+    expect(freshAttributeFilters(fields)).toEqual({
+      a: '', b: { min: '', max: '' }, c: { from: '', to: '' }, d: '', e: '',
+    })
+  })
+})
+
+describe('matchesAttributeField', () => {
+  it('text: matches a case-insensitive substring, empty filter matches anything', () => {
+    expect(matchesAttributeField('text', 'Redline Special', 'red')).toBe(true)
+    expect(matchesAttributeField('text', 'Redline Special', 'blue')).toBe(false)
+    expect(matchesAttributeField('text', 'Redline Special', '')).toBe(true)
+  })
+  it('select: requires exact match, empty filter matches anything', () => {
+    expect(matchesAttributeField('select', 'Redline', 'Redline')).toBe(true)
+    expect(matchesAttributeField('select', 'Redline', 'Basic Wheels')).toBe(false)
+    expect(matchesAttributeField('select', 'Redline', '')).toBe(true)
+  })
+  it('checkbox: filters on the stringified boolean, empty filter matches anything', () => {
+    expect(matchesAttributeField('checkbox', true, 'true')).toBe(true)
+    expect(matchesAttributeField('checkbox', false, 'true')).toBe(false)
+    expect(matchesAttributeField('checkbox', false, 'false')).toBe(true)
+    expect(matchesAttributeField('checkbox', true, '')).toBe(true)
+  })
+  it('number: honors min/max bounds and excludes missing values when a bound is set', () => {
+    expect(matchesAttributeField('number', 5, { min: '3', max: '10' })).toBe(true)
+    expect(matchesAttributeField('number', 2, { min: '3', max: '10' })).toBe(false)
+    expect(matchesAttributeField('number', 11, { min: '3', max: '10' })).toBe(false)
+    expect(matchesAttributeField('number', '', { min: '3', max: '' })).toBe(false)
+    expect(matchesAttributeField('number', 5, { min: '', max: '' })).toBe(true)
+  })
+  it('date: honors from/to bounds', () => {
+    expect(matchesAttributeField('date', '2020-06-01', { from: '2020-01-01', to: '2020-12-31' })).toBe(true)
+    expect(matchesAttributeField('date', '2019-06-01', { from: '2020-01-01', to: '2020-12-31' })).toBe(false)
+    expect(matchesAttributeField('date', '', { from: '2020-01-01', to: '' })).toBe(false)
+  })
+})
+
+describe('matchesAttributeFilters', () => {
+  const fields: FieldDef[] = [
+    { key: 'wheelType', label: 'Wheel Type', type: 'select', options: ['Redline', 'Basic Wheels'] },
+    { key: 'toyNumber', label: 'Toy #', type: 'text' },
+  ]
+  it('AND-combines every field filter', () => {
+    const it1 = item({ attributes: { wheelType: 'Redline', toyNumber: '9876' } })
+    const filters = freshAttributeFilters(fields)
+    filters.wheelType = 'Redline'
+    filters.toyNumber = '987'
+    expect(matchesAttributeFilters(it1, fields, filters)).toBe(true)
+    filters.toyNumber = 'zzz'
+    expect(matchesAttributeFilters(it1, fields, filters)).toBe(false)
+  })
+})
+
+describe('matchesTopLevelFilters', () => {
+  it('AND-combines maker, condition, generation, rarity, value range, and acquired range', () => {
+    const it1 = item({ maker: 'AUTOart', condition: 'Mint', generation: 'C2', rarity: 3, value: 200, acquired: '2021-05-01' })
+    const filters = emptyTopLevelFilters()
+    expect(matchesTopLevelFilters(it1, filters)).toBe(true)
+    filters.maker = 'auto'
+    filters.generation = 'C2'
+    filters.rarityMin = 2
+    filters.valueMin = '100'
+    filters.valueMax = '300'
+    filters.acquiredFrom = '2021-01-01'
+    filters.acquiredTo = '2021-12-31'
+    expect(matchesTopLevelFilters(it1, filters)).toBe(true)
+    filters.generation = 'C4'
+    expect(matchesTopLevelFilters(it1, filters)).toBe(false)
   })
 })
 

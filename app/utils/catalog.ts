@@ -243,6 +243,83 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
   ],
 }
 
+// --- Collection page filtering -------------------------------------------------
+// Per-category attribute filters (one control per CATEGORY_FIELDS[category] entry)
+// plus a handful of common top-level filters. All pure so they're unit-testable
+// without any Nuxt runtime.
+
+export interface NumberRangeFilter { min: string; max: string }
+export interface DateRangeFilter { from: string; to: string }
+export type AttributeFilterValue = string | NumberRangeFilter | DateRangeFilter
+
+export function emptyAttributeFilterValue(type: FieldType): AttributeFilterValue {
+  if (type === 'number') return { min: '', max: '' }
+  if (type === 'date') return { from: '', to: '' }
+  return '' // text, textarea, select, checkbox ('' | 'true' | 'false')
+}
+
+export function freshAttributeFilters(fields: FieldDef[]): Record<string, AttributeFilterValue> {
+  const next: Record<string, AttributeFilterValue> = {}
+  for (const f of fields) next[f.key] = emptyAttributeFilterValue(f.type)
+  return next
+}
+
+export function matchesAttributeField(type: FieldType, value: unknown, filter: AttributeFilterValue): boolean {
+  switch (type) {
+    case 'select':
+      return !filter || value === filter
+    case 'checkbox':
+      return !filter || String(!!value) === filter
+    case 'number': {
+      const { min, max } = filter as NumberRangeFilter
+      const n = Number(value)
+      if (min.trim() !== '' && !(n >= Number(min))) return false
+      if (max.trim() !== '' && !(n <= Number(max))) return false
+      return true
+    }
+    case 'date': {
+      const { from, to } = filter as DateRangeFilter
+      const v = String(value ?? '')
+      if (from.trim() !== '' && !(v && v >= from)) return false
+      if (to.trim() !== '' && !(v && v <= to)) return false
+      return true
+    }
+    default: // text, textarea
+      return !String(filter as string).trim() || String(value ?? '').toLowerCase().includes(String(filter).trim().toLowerCase())
+  }
+}
+
+export function matchesAttributeFilters(item: Pick<Item, 'attributes'>, fields: FieldDef[], filters: Record<string, AttributeFilterValue>): boolean {
+  return fields.every((f) => matchesAttributeField(f.type, item.attributes[f.key], filters[f.key] ?? emptyAttributeFilterValue(f.type)))
+}
+
+export interface TopLevelFilters {
+  maker: string
+  condition: string
+  generation: Generation | ''
+  rarityMin: number | null
+  valueMin: string
+  valueMax: string
+  acquiredFrom: string
+  acquiredTo: string
+}
+
+export const emptyTopLevelFilters = (): TopLevelFilters => ({
+  maker: '', condition: '', generation: '', rarityMin: null, valueMin: '', valueMax: '', acquiredFrom: '', acquiredTo: '',
+})
+
+export function matchesTopLevelFilters(item: Item, filters: TopLevelFilters): boolean {
+  if (filters.maker.trim() && !item.maker.toLowerCase().includes(filters.maker.trim().toLowerCase())) return false
+  if (filters.condition.trim() && !item.condition.toLowerCase().includes(filters.condition.trim().toLowerCase())) return false
+  if (filters.generation && item.generation !== filters.generation) return false
+  if (filters.rarityMin != null && (item.rarity ?? 0) < filters.rarityMin) return false
+  if (filters.valueMin.trim() && item.value < Number(filters.valueMin)) return false
+  if (filters.valueMax.trim() && item.value > Number(filters.valueMax)) return false
+  if (filters.acquiredFrom.trim() && !(item.acquired && item.acquired >= filters.acquiredFrom)) return false
+  if (filters.acquiredTo.trim() && !(item.acquired && item.acquired <= filters.acquiredTo)) return false
+  return true
+}
+
 export interface GradeLevel { value: string; name: string; description: string }
 export const DIECAST_GRADE_SCALE: GradeLevel[] = [
   { value: '10', name: 'Gem Mint', description: 'Car is virtually free of any physical defects, slightest tarnished base or engine is a possible allowance. Chrome on wheels is perfect.' },
