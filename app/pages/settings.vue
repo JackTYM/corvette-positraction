@@ -55,8 +55,12 @@ async function onToggle(e: Event) {
 }
 
 async function onCopy() {
-  await navigator.clipboard.writeText(shareUrl.value)
-  copied.value = true
-  setTimeout(() => { copied.value = false }, 1500)
+  try {
+    await navigator.clipboard.writeText(shareUrl.value)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 1500)
+  } catch (err) {
+    console.warn('Failed to copy share link:', err)
+  }
 }
 </script>
