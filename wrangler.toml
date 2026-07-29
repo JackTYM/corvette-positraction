@@ -2,3 +2,8 @@ name = "corvette-positraction"
 pages_build_output_dir = "./dist"
 compatibility_date = "2026-07-28"
 compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NUXT_PUBLIC_NEON_AUTH_URL = "https://ep-billowing-salad-a68hx6g8.neonauth.us-west-2.aws.neon.tech/neondb/auth"
+NUXT_PUBLIC_NEON_DATA_API_URL = "https://ep-billowing-salad-a68hx6g8.apirest.us-west-2.aws.neon.tech/neondb/rest/v1"
+NUXT_PUBLIC_IMAGE_BASE_URL = "https://image.corvettepositraction.com"
