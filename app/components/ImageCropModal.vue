@@ -49,9 +49,9 @@
 
 <script setup lang="ts">
 const props = withDefaults(defineProps<{ src: string; aspectRatio?: number }>(), {
-  // Matches .index-card-photo (168x118) on the "Index a Find" card, the closest analogue
-  // to a fixed photo frame elsewhere in the app.
-  aspectRatio: 168 / 118,
+  // Matches the source photos on smalldiecastcorvettes.com (consistently 201x104), which
+  // is where the vast majority of photos run through this crop tool originate.
+  aspectRatio: 201 / 104,
 })
 const emit = defineEmits<{ close: []; confirm: [blob: Blob] }>()
 

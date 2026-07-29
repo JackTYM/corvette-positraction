@@ -212,7 +212,13 @@ async function onDelete() {
   if (!window.confirm(`Remove "${item.value.title}" from your archive? This can't be undone.`)) return
   const imgKey = item.value.imgKey
   const docKeys = documents.value.map((d) => d.key)
-  await removeItem(item.value.id)
+  try {
+    await removeItem(item.value.id)
+  } catch (err) {
+    console.warn('Failed to remove item:', err)
+    window.alert("Couldn't remove this item — please try again.")
+    return
+  }
   if (imgKey) {
     try { await removeImage(imgKey) } catch (err) { console.warn('Failed to remove R2 image after item delete:', err) }
   }
