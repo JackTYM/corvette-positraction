@@ -2,7 +2,24 @@ import { sql } from 'drizzle-orm'
 import {
   pgTable, uuid, text, integer, smallint, numeric, boolean, date, timestamp, jsonb, index, unique, check, pgPolicy,
 } from 'drizzle-orm/pg-core'
-import { crudPolicy, authenticatedRole, authUid } from 'drizzle-orm/neon'
+import { crudPolicy, authenticatedRole, anonymousRole, authUid } from 'drizzle-orm/neon'
+
+export const userSettings = pgTable(
+  'user_settings',
+  {
+    userId: text('user_id').primaryKey().default(sql`auth.user_id()`),
+    shareEnabled: boolean('share_enabled').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    crudPolicy({
+      role: authenticatedRole,
+      read: authUid(table.userId),
+      modify: authUid(table.userId),
+    }),
+  ],
+).enableRLS()
 
 export const items = pgTable(
   'items',
@@ -44,6 +61,11 @@ export const items = pgTable(
       read: authUid(table.userId),
       modify: authUid(table.userId),
     }),
+    pgPolicy('items_select_shared', {
+      for: 'select',
+      to: anonymousRole,
+      using: sql`public.is_share_enabled(${table.userId})`,
+    }),
   ],
 ).enableRLS()
 
@@ -83,6 +105,11 @@ export const itemLinks = pgTable(
       read: authUid(table.userId),
       modify: authUid(table.userId),
     }),
+    pgPolicy('item_links_select_shared', {
+      for: 'select',
+      to: anonymousRole,
+      using: sql`public.is_share_enabled(${table.userId})`,
+    }),
   ],
 ).enableRLS()
 
@@ -104,6 +131,11 @@ export const itemDocuments = pgTable(
       role: authenticatedRole,
       read: authUid(table.userId),
       modify: authUid(table.userId),
+    }),
+    pgPolicy('item_documents_select_shared', {
+      for: 'select',
+      to: anonymousRole,
+      using: sql`public.is_share_enabled(${table.userId})`,
     }),
   ],
 ).enableRLS()
@@ -169,6 +201,11 @@ export const wishlistItems = pgTable(
       role: authenticatedRole,
       read: authUid(table.userId),
       modify: authUid(table.userId),
+    }),
+    pgPolicy('wishlist_items_select_shared', {
+      for: 'select',
+      to: anonymousRole,
+      using: sql`public.is_share_enabled(${table.userId})`,
     }),
   ],
 ).enableRLS()
