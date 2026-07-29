@@ -20,6 +20,7 @@
               {{ previewUrl ? 'Replace photo' : 'Upload a photo' }}
               <input type="file" accept="image/*" style="display: none;" @change="onFile" />
             </label>
+            <button v-if="canRecrop" class="link-tab" style="color: var(--muted); font-size: 12px; text-align: left; background: none; border: none;" @click="openRecrop">Adjust crop</button>
             <button v-if="previewUrl" class="link-tab" style="color: var(--muted); font-size: 12px; text-align: left; background: none; border: none;" @click="clearPhoto">Remove</button>
             <span v-if="uploading" class="kicker" style="color: var(--orange); font-size: 10px;">Uploading…</span>
           </div>
@@ -167,6 +168,7 @@
     </div>
 
     <SlotPicker v-if="showLinkPicker" title="Link an Entry" empty-message="No other items to link yet." :candidates="linkCandidates" @close="showLinkPicker = false" @pick="addPendingLink" />
+    <ImageCropModal v-if="showCropModal && cropSrc" :src="cropSrc" @close="showCropModal = false" @confirm="onCropConfirm" />
   </div>
 </template>
 
@@ -225,7 +227,7 @@ watch(() => form.category, (c) => {
 const pendingFile = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
 const uploading = ref(false)
-let uploadedKey: string | null = null
+const uploadedKey = ref<string | null>(null)
 // Set by onFile/clearPhoto so a still-in-flight reference photo import can't clobber
 // a manual photo action the user made while it was running (see importFromUrl below).
 let referencePhotoOverridden = false
@@ -263,7 +265,7 @@ if (typeof fromVariantId === 'string') {
       importFromUrl(variant.imageUrl)
         .then((imported) => {
           if (referencePhotoOverridden) return
-          uploadedKey = imported.key
+          uploadedKey.value = imported.key
           previewUrl.value = imported.url
         })
         .catch((err) => {
@@ -295,7 +297,7 @@ if (typeof fromWishlistQuery === 'string') {
       // Already in R2 from the wishlist entry (either a manual upload or an earlier
       // reference import) -- reuse the key directly, no need to re-import.
       if (wishlistItem.imgKey) {
-        uploadedKey = wishlistItem.imgKey
+        uploadedKey.value = wishlistItem.imgKey
         previewUrl.value = `${cfg.public.imageBaseUrl}/${wishlistItem.imgKey}`
       }
     }
@@ -336,7 +338,7 @@ if (typeof editQuery === 'string') {
       form.attributes = { ...freshAttributes(existing.category), ...existing.attributes }
       sourceVariantId.value = existing.sourceVariantId
       if (existing.imgKey) {
-        uploadedKey = existing.imgKey
+        uploadedKey.value = existing.imgKey
         previewUrl.value = `${cfg.public.imageBaseUrl}/${existing.imgKey}`
       }
     }
@@ -345,18 +347,57 @@ if (typeof editQuery === 'string') {
   }
 }
 
+// Crop step: a freshly-picked file is held here (as an object URL) rather than going
+// straight into pendingFile/previewUrl, so it can be re-cropped again later without
+// re-picking. Re-cropping an already-uploaded photo (edit mode, a converted wishlist
+// entry, or an imported reference photo) has no local File to reuse, so it's re-fetched
+// same-origin through /api/image-proxy (the R2 host sends no CORS headers, so a direct
+// cross-origin <img> load can't be read back out of a canvas).
+const cropSrc = ref<string | null>(null)
+const showCropModal = ref(false)
+let cropObjectUrl: string | null = null
+const canRecrop = computed(() => !!previewUrl.value && (!!cropObjectUrl || !!uploadedKey.value))
+
+function revokeIfBlob(url: string | null) {
+  if (url && url.startsWith('blob:')) URL.revokeObjectURL(url)
+}
+onBeforeUnmount(() => {
+  revokeIfBlob(cropObjectUrl)
+  revokeIfBlob(previewUrl.value)
+})
+
 function onFile(e: Event) {
-  const file = (e.target as HTMLInputElement).files?.[0]
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
   if (!file) return
+  revokeIfBlob(cropObjectUrl)
+  cropObjectUrl = URL.createObjectURL(file)
+  cropSrc.value = cropObjectUrl
+  showCropModal.value = true
+  input.value = ''
+}
+function openRecrop() {
+  if (cropObjectUrl) cropSrc.value = cropObjectUrl
+  else if (uploadedKey.value) cropSrc.value = `/api/image-proxy?key=${encodeURIComponent(uploadedKey.value)}`
+  else return
+  showCropModal.value = true
+}
+function onCropConfirm(blob: Blob) {
   referencePhotoOverridden = true
-  pendingFile.value = file
-  previewUrl.value = URL.createObjectURL(file)
+  revokeIfBlob(previewUrl.value)
+  const cropped = new File([blob], 'cropped.png', { type: blob.type || 'image/png' })
+  pendingFile.value = cropped
+  previewUrl.value = URL.createObjectURL(cropped)
+  showCropModal.value = false
 }
 function clearPhoto() {
   referencePhotoOverridden = true
+  revokeIfBlob(previewUrl.value)
+  revokeIfBlob(cropObjectUrl)
+  cropObjectUrl = null
   pendingFile.value = null
   previewUrl.value = null
-  uploadedKey = null
+  uploadedKey.value = null
 }
 
 const pendingDocuments = ref<File[]>([])
@@ -389,7 +430,7 @@ async function onSave() {
     if (pendingFile.value) {
       uploading.value = true
       const result = await upload(pendingFile.value)
-      uploadedKey = result.key
+      uploadedKey.value = result.key
     }
     const payload: Partial<Item> = {
       title: form.title, sub: form.sub || 'Newly catalogued', category: form.category,
@@ -400,7 +441,7 @@ async function onSave() {
       rarity: form.rarity,
       condition: form.condition || 'Not yet assessed', location: form.location || 'Unfiled',
       story: form.story || 'No notes recorded yet.',
-      imgKey: uploadedKey, sourceVariantId: sourceVariantId.value, attributes: coerceAttributesForSave(fields.value, form.attributes),
+      imgKey: uploadedKey.value, sourceVariantId: sourceVariantId.value, attributes: coerceAttributesForSave(fields.value, form.attributes),
     }
     if (!editingItemId.value) {
       // Only relevant on create -- editing must not reset these to blank/false.
