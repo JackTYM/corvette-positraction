@@ -9,7 +9,7 @@
         <label style="display: block;">
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Photo</span>
           <div v-if="previewUrl" style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-            <div class="index-card-photo" style="width: 96px; height: 50px;">
+            <div class="index-card-photo" style="width: 96px;">
               <img :src="previewUrl" alt="" class="index-card-photo-img" />
             </div>
             <button type="button" class="link-tab" style="color: var(--muted); font-size: 12px; background: none; border: none;" @click="openRecrop">Adjust crop</button>

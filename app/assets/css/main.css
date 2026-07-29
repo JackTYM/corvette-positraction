@@ -19,6 +19,12 @@
   --halftone: 0.55; /* 0.55, not the design's 0.5 — matches the prototype's real default */
   --paper-tex: 0.5;
   --gap: 26px;
+
+  /* Matches smalldiecastcorvettes.com's source image ratio (201x104) and ImageCropModal's
+     default crop frame -- every photo container on the site should share this ratio so a
+     freshly-cropped photo displays identically everywhere, not letterboxed in some places
+     and full-bleed in others. */
+  --photo-ratio: 201 / 104;
 }
 
 * { box-sizing: border-box; }
@@ -328,7 +334,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
   transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 .editorial-card:hover { transform: translateY(-3px); box-shadow: 0 1px 0 rgba(28,24,20,0.06), 0 26px 40px -22px rgba(28,24,20,0.7); }
-.editorial-card-photo { position: relative; border-bottom: 2px solid var(--ink); background: #17120d; height: 190px; overflow: hidden; }
+.editorial-card-photo { position: relative; border-bottom: 2px solid var(--ink); background: #17120d; aspect-ratio: var(--photo-ratio); overflow: hidden; }
 .editorial-card-img { width: 100%; height: 100%; object-fit: contain; }
 .editorial-card-placeholder {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -345,7 +351,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .toc-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; margin-top: 40px; }
 
 .featured-card { cursor: pointer; border: 2px solid var(--ink); background: var(--paper); box-shadow: var(--shadow); }
-.featured-photo { position: relative; border-bottom: 2px solid var(--ink); height: 290px; overflow: hidden; background: #17120d; }
+.featured-photo { position: relative; border-bottom: 2px solid var(--ink); aspect-ratio: var(--photo-ratio); overflow: hidden; background: #17120d; }
 .featured-img { width: 100%; height: 100%; object-fit: contain; }
 .featured-value { position: absolute; bottom: 14px; right: 16px; }
 
@@ -360,7 +366,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .collection-empty { text-align: center; padding: 50px 20px; border: 2px dashed var(--rule); color: var(--muted); }
 
 .detail-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 44px; }
-.detail-photo { position: relative; border: 2px solid var(--ink); box-shadow: var(--shadow); height: 420px; overflow: hidden; background: #17120d; }
+.detail-photo { position: relative; border: 2px solid var(--ink); box-shadow: var(--shadow); aspect-ratio: var(--photo-ratio); overflow: hidden; background: #17120d; }
 .detail-img { width: 100%; height: 100%; object-fit: contain; }
 .detail-condition { border: 2px solid var(--ink); border-top: none; padding: 16px 18px; background: var(--paper-2); }
 .detail-value-banner { display: flex; align-items: center; gap: 20px; margin: 20px 0; padding: 14px 18px; background: var(--ink); color: var(--paper); }
@@ -373,7 +379,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .index-card-head { background: var(--orange); color: var(--paper); padding: 10px 20px; }
 .index-card-body { padding: 26px 28px 28px; }
 .index-card-photo-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.index-card-photo { width: 180px; height: 93px; border: 2px solid var(--ink); background: #17120d; flex: 0 0 auto; position: relative; overflow: hidden; }
+.index-card-photo { width: 180px; aspect-ratio: var(--photo-ratio); border: 2px solid var(--ink); background: #17120d; flex: 0 0 auto; position: relative; overflow: hidden; }
 .index-card-photo-img { width: 100%; height: 100%; object-fit: contain; }
 .index-card-photo-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; color: rgba(245,240,232,0.5); }
 .index-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; margin-bottom: 20px; }
