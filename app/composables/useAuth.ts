@@ -4,6 +4,13 @@ interface AuthUser {
   name?: string | null
 }
 
+// neon.auth.* rejects instead of resolving to { error } for HTTP-level failures
+// (wrong password, duplicate email, network errors), so every call site must catch.
+function toAuthError(err: unknown): { message: string } {
+  if (err instanceof Error) return { message: err.message }
+  return { message: 'Something went wrong. Please try again.' }
+}
+
 export function useAuth() {
   const user = useState<AuthUser | null>('auth:user', () => null)
   const neon = useNeon()
@@ -15,22 +22,34 @@ export function useAuth() {
   }
 
   async function signUp(email: string, password: string, name?: string) {
-    const { data, error } = await neon.auth.signUp.email({ email, password, name: name ?? '' })
-    if (error) return { error }
-    await refreshSession()
-    return { data }
+    try {
+      const { data, error } = await neon.auth.signUp.email({ email, password, name: name ?? '' })
+      if (error) return { error }
+      await refreshSession()
+      return { data }
+    } catch (err) {
+      return { error: toAuthError(err) }
+    }
   }
 
   async function signIn(email: string, password: string) {
-    const { data, error } = await neon.auth.signIn.email({ email, password })
-    if (error) return { error }
-    await refreshSession()
-    return { data }
+    try {
+      const { data, error } = await neon.auth.signIn.email({ email, password })
+      if (error) return { error }
+      await refreshSession()
+      return { data }
+    } catch (err) {
+      return { error: toAuthError(err) }
+    }
   }
 
   async function signInWithGoogle() {
-    const { error } = await neon.auth.signIn.social({ provider: 'google', callbackURL: '/' })
-    if (error) return { error }
+    try {
+      const { error } = await neon.auth.signIn.social({ provider: 'google', callbackURL: '/' })
+      if (error) return { error }
+    } catch (err) {
+      return { error: toAuthError(err) }
+    }
   }
 
   async function signOut() {
