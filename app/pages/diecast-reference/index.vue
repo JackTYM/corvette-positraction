@@ -6,7 +6,7 @@
       Every known diecast Corvette release, sourced from <a href="https://smalldiecastcorvettes.com" target="_blank" rel="noopener">smalldiecastcorvettes.com</a>. Click a picture to add it to your archive.
     </p>
 
-    <div v-if="manufacturers.length" class="no-print" style="display: flex; gap: 8px; border-bottom: 2px solid var(--ink); margin-bottom: 24px;">
+    <div v-if="manufacturers.length" class="no-print" style="display: flex; flex-wrap: wrap; row-gap: 6px; column-gap: 8px; border-bottom: 2px solid var(--ink); margin-bottom: 24px;">
       <button
         v-for="m in manufacturers"
         :key="m"
@@ -60,7 +60,7 @@
 import type { DiecastModel, DiecastVariant } from '~/composables/useDiecastReference'
 import { extractYearFromName } from '~/utils/catalog'
 
-const { fetchModels, fetchVariants } = useDiecastReference()
+const { fetchModels, fetchVariants, fetchVariantModelIds } = useDiecastReference()
 const { items: collectionItems, fetchAll: fetchCollectionItems } = useItems()
 const { items: wishlistItemsList, fetchAll: fetchWishlistItems, create: createWishlistItem } = useWishlist()
 const { importFromUrl } = useImageUpload()
@@ -91,7 +91,53 @@ try {
   console.warn('Failed to load wishlist items for dedup check:', err)
 }
 
-const manufacturers = computed(() => [...new Set(models.value.map((m) => m.manufacturer))])
+const addedLookup = computed(() => {
+  const map = new Map<string, { type: 'collection' | 'wishlist'; id: string }>()
+  for (const item of collectionItems.value) {
+    if (item.sourceVariantId) map.set(item.sourceVariantId, { type: 'collection', id: item.id })
+  }
+  for (const item of wishlistItemsList.value) {
+    if (item.sourceVariantId) map.set(item.sourceVariantId, { type: 'wishlist', id: item.id })
+  }
+  return map
+})
+
+// Resolves each added variant back to its model's manufacturer, so tabs can be sorted
+// by how much of that brand is already in the collection/wishlist. Only fetches the
+// (small) set of variants actually referenced by items, not the full ~5k variant table.
+const addedVariantModelIds = ref<{ id: string; modelId: string }[]>([])
+watch(addedLookup, async (lookup) => {
+  const variantIds = [...lookup.keys()]
+  if (!variantIds.length) {
+    addedVariantModelIds.value = []
+    return
+  }
+  try {
+    addedVariantModelIds.value = await fetchVariantModelIds(variantIds)
+  } catch (err) {
+    console.warn('Failed to resolve manufacturers for added items:', err)
+  }
+}, { immediate: true })
+
+const addedCountByManufacturer = computed(() => {
+  const manufacturerByModelId = new Map(models.value.map((m) => [m.id, m.manufacturer]))
+  const counts = new Map<string, number>()
+  for (const { modelId } of addedVariantModelIds.value) {
+    const manufacturer = manufacturerByModelId.get(modelId)
+    if (!manufacturer) continue
+    counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1)
+  }
+  return counts
+})
+
+const manufacturers = computed(() => {
+  const counts = addedCountByManufacturer.value
+  return [...new Set(models.value.map((m) => m.manufacturer))].sort((a, b) => {
+    if (a === 'Hot Wheels' || b === 'Hot Wheels') return a === 'Hot Wheels' ? -1 : 1
+    const countDiff = (counts.get(b) ?? 0) - (counts.get(a) ?? 0)
+    return countDiff !== 0 ? countDiff : a.localeCompare(b)
+  })
+})
 const activeManufacturer = ref<string>('')
 watch(manufacturers, (list) => {
   if (!activeManufacturer.value && list.length) activeManufacturer.value = list[0]!
@@ -131,17 +177,6 @@ watch(modelsForActiveTab, async (modelsInTab) => {
     }
   }
 }, { immediate: true })
-
-const addedLookup = computed(() => {
-  const map = new Map<string, { type: 'collection' | 'wishlist'; id: string }>()
-  for (const item of collectionItems.value) {
-    if (item.sourceVariantId) map.set(item.sourceVariantId, { type: 'collection', id: item.id })
-  }
-  for (const item of wishlistItemsList.value) {
-    if (item.sourceVariantId) map.set(item.sourceVariantId, { type: 'wishlist', id: item.id })
-  }
-  return map
-})
 
 async function addToWishlist(variant: DiecastVariant, model: DiecastModel) {
   if (wishlistBusy.value.has(variant.id)) return

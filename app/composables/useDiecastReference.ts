@@ -58,5 +58,12 @@ export function useDiecastReference() {
     return data ? fromVariantRow(data as DiecastVariantRow) : null
   }
 
-  return { fetchModels, fetchModel, fetchVariants, fetchVariant }
+  async function fetchVariantModelIds(variantIds: string[]): Promise<{ id: string; modelId: string }[]> {
+    if (!variantIds.length) return []
+    const { data, error } = await neon.from('diecast_variants').select('id, model_id').in('id', variantIds)
+    if (error) throw error
+    return (data as { id: string; model_id: string }[]).map((r) => ({ id: r.id, modelId: r.model_id }))
+  }
+
+  return { fetchModels, fetchModel, fetchVariants, fetchVariant, fetchVariantModelIds }
 }
