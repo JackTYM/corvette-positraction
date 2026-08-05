@@ -70,6 +70,7 @@
       </div>
     </div>
     <p v-if="!loadingModels && models.length === 0" style="font-style: italic; color: var(--muted);">No reference models yet — run the scraper.</p>
+    <p v-if="!loadingModels && models.length > 0 && modelsForActiveTab.length === 0" style="font-style: italic; color: var(--muted);">No {{ activeGeneration === 'All' ? '' : (activeGeneration === '—' ? 'unknown-generation ' : activeGeneration + ' ') }}models for {{ activeManufacturer }}.</p>
   </div>
 </template>
 
