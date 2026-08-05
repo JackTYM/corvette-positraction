@@ -1,6 +1,6 @@
 <template>
   <div class="wrap" style="padding: 34px 26px 80px;">
-    <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section Three</div>
+    <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section Two</div>
     <h2 style="font-size: clamp(38px, 6.5vw, 68px); line-height: 0.9; margin-bottom: 8px;">The Garage</h2>
     <p style="font-style: italic; color: var(--muted); font-size: 16.5px; margin: 0 0 6px; max-width: 620px;">
       A working plan of the display cases on the wall. Build each case to the size of the real frame, then arrange the cars by hand — or let the whole wall re-file itself in one move.

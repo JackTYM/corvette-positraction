@@ -1,6 +1,6 @@
 <template>
   <div class="wrap" style="padding: 34px 26px 70px;">
-    <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section Two</div>
+    <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section One</div>
     <h2 style="font-size: clamp(38px, 6.5vw, 68px); line-height: 0.9; margin-bottom: 18px;">The Collection</h2>
 
     <CategoryFilterPanel :items="items" @open="openItem" />
