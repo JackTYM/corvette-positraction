@@ -25,7 +25,7 @@
             <button v-for="k in arrangeKeys" :key="k" class="sort-menu-row" @click="onArrange(k)">{{ ARRANGE_LABELS[k] }}</button>
           </div>
         </div>
-        <button class="icon-btn" @click="$emit('edit', index)">resize</button>
+        <button class="icon-btn" @click="$emit('edit', index)">edit</button>
         <button class="icon-btn" @click="$emit('empty', index)">empty</button>
         <button v-if="canRemove" class="icon-btn danger" @click="$emit('remove', index)">remove</button>
       </div>

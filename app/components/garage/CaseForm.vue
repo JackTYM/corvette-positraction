@@ -2,7 +2,7 @@
   <div class="modal-scrim no-print" @click="$emit('cancel')">
     <div class="modal-card" style="max-width: 440px;" @click.stop>
       <div style="background: var(--ink); color: var(--paper); padding: 12px 18px;">
-        <span class="kicker" style="letter-spacing: 0.18em; font-size: 12px;">{{ initial ? 'Resize This Case' : 'Build a Display Case' }}</span>
+        <span class="kicker" style="letter-spacing: 0.18em; font-size: 12px;">{{ initial ? 'Edit This Case' : 'Build a Display Case' }}</span>
       </div>
       <div style="padding: 22px 22px 24px;">
         <label style="display: block; margin-bottom: 20px;">
@@ -25,7 +25,7 @@
         </div>
         <div style="display: flex; gap: 12px; margin-top: 22px; justify-content: flex-end;">
           <button class="btn ghost" @click="$emit('cancel')">Cancel</button>
-          <button class="btn primary" @click="save">{{ initial ? 'Save Size' : 'Build It' }}</button>
+          <button class="btn primary" @click="save">{{ initial ? 'Save Changes' : 'Build It' }}</button>
         </div>
       </div>
     </div>
