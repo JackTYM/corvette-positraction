@@ -17,6 +17,23 @@
       >{{ m }}</button>
     </div>
 
+    <div v-if="availableGenerations.length" class="no-print" style="display: flex; flex-wrap: wrap; row-gap: 6px; column-gap: 8px; border-bottom: 1px solid var(--ink); margin-bottom: 24px;">
+      <button
+        type="button"
+        class="link-tab"
+        :style="{ padding: '8px 16px', borderBottom: activeGeneration === 'All' ? '3px solid var(--orange)' : '3px solid transparent', fontWeight: activeGeneration === 'All' ? 700 : 400 }"
+        @click="activeGeneration = 'All'"
+      >All</button>
+      <button
+        v-for="g in availableGenerations"
+        :key="g"
+        type="button"
+        class="link-tab"
+        :style="{ padding: '8px 16px', borderBottom: g === activeGeneration ? '3px solid var(--orange)' : '3px solid transparent', fontWeight: g === activeGeneration ? 700 : 400 }"
+        @click="activeGeneration = g"
+      >{{ g === '—' ? 'Unknown' : g }}</button>
+    </div>
+
     <div v-for="model in modelsForActiveTab" :key="model.id" style="margin-bottom: 36px;">
       <div class="kicker" style="color: var(--orange); margin-bottom: 12px;">{{ model.name }}</div>
       <div class="mag-grid">
@@ -58,7 +75,7 @@
 
 <script setup lang="ts">
 import type { DiecastModel, DiecastVariant } from '~/composables/useDiecastReference'
-import { extractYearFromName } from '~/utils/catalog'
+import { deriveGeneration, compareByGeneration, GEN_ORDER, type Generation } from '~/utils/catalog'
 
 const { fetchModels, fetchVariants, fetchVariantModelIds } = useDiecastReference()
 const { items: collectionItems, fetchAll: fetchCollectionItems } = useItems()
@@ -143,27 +160,26 @@ watch(manufacturers, (list) => {
   if (!activeManufacturer.value && list.length) activeManufacturer.value = list[0]!
 }, { immediate: true })
 
-// A best-effort chronological sort for browsing, not a data-integrity concern like the
-// Add form's prefill -- unlike extractYearFromName (catalog.ts), this also resolves
-// 2-digit years using a pivot (<=30 -> 20xx, else 19xx), which correctly covers every
-// 2-digit year actually seen in the scraped names (e.g. "09"/"11"/"12"/"14" -> 2000s,
-// "62".."82" -> 1900s) since real Corvette generations don't collide across that pivot.
-// Worst case for a name we truly can't parse is it sorts to the end, not wrong data.
-function estimateYearForSort(name: string): number {
-  const fourDigit = extractYearFromName(name)
-  if (fourDigit) return fourDigit
-  const twoDigit = name.match(/\b\d{2}\b/)
-  if (twoDigit) {
-    const n = Number(twoDigit[0])
-    return n <= 30 ? 2000 + n : 1900 + n
-  }
-  return 9999
-}
+const generationByModelId = computed(() => {
+  const map = new Map<string, { generation: Generation; year: number | null }>()
+  for (const m of models.value) map.set(m.id, deriveGeneration(m.name))
+  return map
+})
+
+const activeGeneration = ref<'All' | Generation>('All')
+const availableGenerations = computed(() => {
+  const present = new Set(models.value.map((m) => generationByModelId.value.get(m.id)!.generation))
+  return GEN_ORDER.filter((g) => present.has(g))
+})
 
 const modelsForActiveTab = computed(() =>
   models.value
     .filter((m) => m.manufacturer === activeManufacturer.value)
-    .sort((a, b) => estimateYearForSort(a.name) - estimateYearForSort(b.name)),
+    .filter((m) => activeGeneration.value === 'All' || generationByModelId.value.get(m.id)!.generation === activeGeneration.value)
+    .sort((a, b) => compareByGeneration(
+      { ...generationByModelId.value.get(a.id)!, name: a.name },
+      { ...generationByModelId.value.get(b.id)!, name: b.name },
+    )),
 )
 
 watch(modelsForActiveTab, async (modelsInTab) => {
