@@ -6,8 +6,16 @@
       <button class="btn primary no-print" @click="showModal = true">+ Add to Wishlist</button>
     </div>
 
+    <div v-if="items.length > 1" class="no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px;">
+      <span class="kicker" style="color: var(--muted); font-size: 10px; margin-right: 2px;">Sort by</span>
+      <button
+        v-for="k in sortKeys" :key="k" class="link-tab whole-wall-tab" :class="{ suggested: k === 'release', active: k === activeSort }"
+        @click="activeSort = k"
+      >{{ ARRANGE_LABELS[k] }}</button>
+    </div>
+
     <div class="mag-grid">
-      <NuxtLink v-for="w in items" :key="w.id" :to="`/wishlist/${w.id}`" class="editorial-card" style="text-decoration: none; color: inherit;">
+      <NuxtLink v-for="w in sortedItems" :key="w.id" :to="`/wishlist/${w.id}`" class="editorial-card" style="text-decoration: none; color: inherit;">
         <div class="editorial-card-photo photo-frame">
           <img v-if="w.imgKey" :src="`${imageBaseUrl}/${w.imgKey}`" :alt="w.title" class="editorial-card-img" />
           <div v-else class="editorial-card-placeholder">No photo yet</div>
@@ -25,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney } from '~/utils/catalog'
+import { fmtMoney, ARRANGE, ARRANGE_LABELS, wishlistItemAsCard } from '~/utils/catalog'
 
 const { items, fetchAll } = useWishlist()
 const showModal = ref(false)
@@ -39,4 +47,10 @@ if (!items.value.length) {
     console.warn('Failed to load wishlist items:', err)
   }
 }
+
+const sortKeys: (keyof typeof ARRANGE_LABELS)[] = ['release', 'date', 'value']
+const activeSort = ref<keyof typeof ARRANGE_LABELS>('release')
+const sortedItems = computed(() =>
+  [...items.value].sort((a, b) => ARRANGE[activeSort.value](wishlistItemAsCard(a), wishlistItemAsCard(b))),
+)
 </script>

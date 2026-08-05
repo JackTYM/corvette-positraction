@@ -395,3 +395,4 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .garage-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); padding: 12px 0; margin-bottom: 26px; }
 .whole-wall-tab { font-size: 12px; padding: 6px 12px; border: 1.5px solid var(--ink); background: transparent; }
 .whole-wall-tab.suggested { background: var(--paper-2); }
+.whole-wall-tab.active { background: var(--ink); color: var(--paper); }
