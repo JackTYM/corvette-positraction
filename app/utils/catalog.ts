@@ -59,6 +59,50 @@ export function extractYearFromName(name: string): number | null {
   return match ? Number(match[0]) : null
 }
 
+const GENERATION_CODE_RE = /\bC([1-8])\b/i
+
+function estimateYear(name: string): number | null {
+  const fourDigit = extractYearFromName(name)
+  if (fourDigit) return fourDigit
+  const twoDigit = name.match(/\b\d{2}\b/)
+  if (twoDigit) {
+    const n = Number(twoDigit[0])
+    return n <= 30 ? 2000 + n : 1900 + n
+  }
+  return null
+}
+
+function generationYearRange(gen: Exclude<Generation, '—'>): [number, number] {
+  const [start, end] = GENERATIONS[gen].years.split('–')
+  return [Number(start), end === 'Now' ? Infinity : Number(end)]
+}
+
+function generationForYear(year: number): Generation | null {
+  for (const gen of Object.keys(GENERATIONS) as Exclude<Generation, '—'>[]) {
+    const [start, end] = generationYearRange(gen)
+    if (year >= start && year <= end) return gen
+  }
+  return null
+}
+
+// A best-effort chronological lookup for browsing the diecast reference catalog, not a
+// data-integrity concern like the Add form's prefill -- unlike extractYearFromName alone,
+// this also resolves 2-digit years using a pivot (<=30 -> 20xx, else 19xx), which correctly
+// covers every 2-digit year actually seen in the scraped names. An explicit generation code
+// in the name (e.g. "C6", "C7") wins over a guessed year, since the pivot heuristic is a
+// guess while the code is a direct claim. Worst case for a name with neither is it's grouped
+// as unknown ('—'), not wrongly generationed.
+export function deriveGeneration(name: string): { generation: Generation; year: number | null } {
+  const codeMatch = name.match(GENERATION_CODE_RE)
+  const year = estimateYear(name)
+  if (codeMatch) return { generation: `C${codeMatch[1]}` as Generation, year }
+  if (year != null) {
+    const gen = generationForYear(year)
+    if (gen) return { generation: gen, year }
+  }
+  return { generation: '—', year }
+}
+
 export const fmtDate = (iso: string | null | undefined): string => {
   if (!iso) return '—'
   const d = new Date(iso + 'T00:00:00')

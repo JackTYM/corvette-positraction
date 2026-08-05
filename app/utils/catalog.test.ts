@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, extractYearFromName, type Item,
   freshAttributeFilters, matchesAttributeField, matchesAttributeFilters, emptyTopLevelFilters, matchesTopLevelFilters,
+  deriveGeneration,
   type FieldDef,
 } from './catalog'
 
@@ -176,5 +177,30 @@ describe('extractYearFromName', () => {
   })
   it('returns null when there is no year at all', () => {
     expect(extractYearFromName('custom corvette')).toBeNull()
+  })
+})
+
+describe('deriveGeneration', () => {
+  it('reads an explicit generation code from the name, case-insensitively', () => {
+    expect(deriveGeneration('C7 R').generation).toBe('C7')
+    expect(deriveGeneration('c6 convertible').generation).toBe('C6')
+    expect(deriveGeneration('CORVETTE C7 Z06').generation).toBe('C7')
+    expect(deriveGeneration('c6-r').generation).toBe('C6')
+    expect(deriveGeneration('callaway c7').generation).toBe('C7')
+  })
+  it('infers generation from a confident 4-digit year when there is no code', () => {
+    expect(deriveGeneration('1963 corvette')).toEqual({ generation: 'C2', year: 1963 })
+    expect(deriveGeneration('1997 corvette')).toEqual({ generation: 'C5', year: 1997 })
+  })
+  it('infers generation from a 2-digit year using the pivot fallback when there is no code', () => {
+    expect(deriveGeneration('09 corvette stingray concept')).toEqual({ generation: 'C6', year: 2009 })
+    expect(deriveGeneration('82 corvette')).toEqual({ generation: 'C3', year: 1982 })
+  })
+  it('prefers the explicit code over a conflicting parsed year', () => {
+    expect(deriveGeneration('C7 09 special')).toEqual({ generation: 'C7', year: 2009 })
+  })
+  it('falls back to unknown when neither a code nor a year can be found', () => {
+    expect(deriveGeneration('vette funny')).toEqual({ generation: '—', year: null })
+    expect(deriveGeneration('custom corvette')).toEqual({ generation: '—', year: null })
   })
 })
