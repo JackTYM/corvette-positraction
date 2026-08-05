@@ -4,6 +4,7 @@ import {
   freshAttributeFilters, matchesAttributeField, matchesAttributeFilters, emptyTopLevelFilters, matchesTopLevelFilters,
   deriveGeneration, compareByGeneration, type Generation,
   type FieldDef,
+  type WallCard, wishlistItemAsCard,
 } from './catalog'
 
 function item(overrides: Partial<Item>): Item {
@@ -241,5 +242,30 @@ describe('compareByGeneration', () => {
     const lastC6Index = sortedGenerations.lastIndexOf('C6')
     const firstC7Index = sortedGenerations.indexOf('C7')
     expect(lastC6Index).toBeLessThan(firstC7Index)
+  })
+})
+
+describe('wishlistItemAsCard', () => {
+  it('synthesizes a full Item from a thin wishlist row, deriving generation/year from the title', () => {
+    const card = wishlistItemAsCard({
+      id: 'wish-1', title: 'C7 R', estimatedPrice: 150, imgKey: 'user-1/abc.jpg',
+      sourceVariantId: 'variant-1', createdAt: '2020-05-15T00:00:00Z',
+    })
+    expect(card.id).toBe('wish-1')
+    expect(card.title).toBe('C7 R')
+    expect(card.category).toBe('DIECAST')
+    expect(card.generation).toBe('C7')
+    expect(card.value).toBe(150)
+    expect(card.imgKey).toBe('user-1/abc.jpg')
+    expect(card.sourceVariantId).toBe('variant-1')
+    expect(card.acquired).toBe('2020-05-15')
+  })
+  it('falls back to unknown generation and blank year when the title has neither a code nor a year', () => {
+    const card = wishlistItemAsCard({
+      id: 'wish-2', title: 'Custom Corvette', estimatedPrice: 0, imgKey: null,
+      sourceVariantId: null, createdAt: '2021-01-01T00:00:00Z',
+    })
+    expect(card.generation).toBe('—')
+    expect(card.year).toBe('')
   })
 })

@@ -51,6 +51,8 @@ export interface Item {
   sourceVariantId: string | null
 }
 
+export interface WallCard extends Item { owned: boolean }
+
 export const fmtMoney = (n: number | null | undefined): string =>
   '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })
 
@@ -101,6 +103,17 @@ export function deriveGeneration(name: string): { generation: Generation; year: 
     if (gen) return { generation: gen, year }
   }
   return { generation: '—', year }
+}
+
+export function wishlistItemAsCard(w: { id: string; title: string; estimatedPrice: number; imgKey: string | null; sourceVariantId: string | null; createdAt: string }): Item {
+  const { generation, year } = deriveGeneration(w.title)
+  return {
+    id: w.id, title: w.title, sub: '', category: 'DIECAST', generation, year: year ?? '',
+    scale: '', maker: '', acquired: w.createdAt.slice(0, 10), pricePaid: 0, value: w.estimatedPrice,
+    valueAsOf: '', valueSource: '', productionDate: '', rarity: null, condition: '', location: '',
+    story: '', featured: false, colorName: '', colorHex: '', imgKey: w.imgKey, attributes: {},
+    sourceVariantId: w.sourceVariantId,
+  }
 }
 
 export const fmtDate = (iso: string | null | undefined): string => {

@@ -14,6 +14,7 @@ describe('fromWishlistRow', () => {
       id: 'wish-1', title: 'Corvette C8 1:18', estimatedPrice: 150,
       sourceUrl: 'https://smalldiecastcorvettes.com/car/334_HW_CORVETTE_C7_Z06.html',
       notes: 'Waiting for a sale', imgKey: 'user-1/abc.jpg', sourceVariantId: 'variant-1',
+      createdAt: '2020-01-01T00:00:00Z',
     })
   })
   it('defaults null price/text fields for a manual entry with no source', () => {

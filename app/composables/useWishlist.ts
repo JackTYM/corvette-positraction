@@ -19,6 +19,7 @@ export interface WishlistItem {
   notes: string
   imgKey: string | null
   sourceVariantId: string | null
+  createdAt: string
 }
 
 export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
@@ -30,6 +31,7 @@ export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
     notes: row.notes ?? '',
     imgKey: row.img_key,
     sourceVariantId: row.source_variant_id,
+    createdAt: row.created_at,
   }
 }
 
