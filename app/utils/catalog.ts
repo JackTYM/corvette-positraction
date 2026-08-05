@@ -161,6 +161,14 @@ const genIndex = (item: Pick<Item,'generation'>) => {
   return i < 0 ? 99 : i
 }
 
+export function compareByGeneration(a: { generation: Generation; year: number | null; name: string }, b: { generation: Generation; year: number | null; name: string }): number {
+  const genDiff = genIndex(a) - genIndex(b)
+  if (genDiff !== 0) return genDiff
+  const yearDiff = (a.year ?? Infinity) - (b.year ?? Infinity)
+  if (!isNaN(yearDiff) && yearDiff !== 0) return yearDiff
+  return a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+}
+
 type Comparator = (a: Item, b: Item) => number
 export const ARRANGE: Record<'release'|'date'|'generation'|'color'|'category'|'value', Comparator> = {
   release: (a, b) => (Number(a.year) || 0) - (Number(b.year) || 0) || genIndex(a) - genIndex(b) || String(a.title).localeCompare(String(b.title)),

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, extractYearFromName, type Item,
   freshAttributeFilters, matchesAttributeField, matchesAttributeFilters, emptyTopLevelFilters, matchesTopLevelFilters,
-  deriveGeneration,
+  deriveGeneration, compareByGeneration, type Generation,
   type FieldDef,
 } from './catalog'
 
@@ -202,5 +202,44 @@ describe('deriveGeneration', () => {
   it('falls back to unknown when neither a code nor a year can be found', () => {
     expect(deriveGeneration('vette funny')).toEqual({ generation: '—', year: null })
     expect(deriveGeneration('custom corvette')).toEqual({ generation: '—', year: null })
+  })
+})
+
+describe('compareByGeneration', () => {
+  const info = (generation: Generation, year: number | null, name: string) => ({ generation, year, name })
+
+  it('sorts by generation order first', () => {
+    const c7 = info('C7', null, 'a')
+    const c6 = info('C6', null, 'b')
+    expect(compareByGeneration(c7, c6)).toBeGreaterThan(0)
+    expect(compareByGeneration(c6, c7)).toBeLessThan(0)
+  })
+
+  it('sorts by year ascending within the same generation', () => {
+    const later = info('C6', 2010, 'a')
+    const earlier = info('C6', 2005, 'b')
+    expect(compareByGeneration(later, earlier)).toBeGreaterThan(0)
+  })
+
+  it('sorts models with no year after dated peers in the same generation', () => {
+    const dated = info('C6', 2005, 'dated')
+    const undated = info('C6', null, 'undated')
+    expect(compareByGeneration(undated, dated)).toBeGreaterThan(0)
+  })
+
+  it('falls back to case-insensitive alphanumeric name comparison as a final tiebreaker', () => {
+    const upper = info('C7', null, 'ALPHA')
+    const lower = info('C7', null, 'beta')
+    expect(compareByGeneration(upper, lower)).toBeLessThan(0)
+    expect(compareByGeneration(lower, upper)).toBeGreaterThan(0)
+  })
+
+  it('fixes the real C6/C7 Hot Wheels casing bug: every C6 name sorts before every C7 name', () => {
+    const names = ['C7 R', 'C7 Z06 CONVERTIBLE', 'CORVETTE C7 Z06', 'c6', 'c6 convertible', 'c6-r', 'callaway c7']
+    const items = names.map((name) => ({ ...deriveGeneration(name), name }))
+    const sortedGenerations = [...items].sort(compareByGeneration).map((i) => i.generation)
+    const lastC6Index = sortedGenerations.lastIndexOf('C6')
+    const firstC7Index = sortedGenerations.indexOf('C7')
+    expect(lastC6Index).toBeLessThan(firstC7Index)
   })
 })
