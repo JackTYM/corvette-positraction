@@ -267,5 +267,14 @@ describe('wishlistItemAsCard', () => {
     })
     expect(card.generation).toBe('—')
     expect(card.year).toBe('')
+    expect(card.value).toBe(0)
+  })
+  it('composes into a WallCard by adding the owned flag', () => {
+    const card: WallCard = { ...wishlistItemAsCard({
+      id: 'wish-3', title: 'C6 Convertible', estimatedPrice: 50, imgKey: null,
+      sourceVariantId: null, createdAt: '2022-03-01T00:00:00Z',
+    }), owned: false }
+    expect(card.owned).toBe(false)
+    expect(card.generation).toBe('C6')
   })
 })
