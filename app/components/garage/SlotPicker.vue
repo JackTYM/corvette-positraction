@@ -12,6 +12,7 @@
         <button v-for="it in candidates" :key="it.id" class="pick-row" @click="$emit('pick', it.id)">
           <span class="pick-swatch" :style="{ background: colorOf(it).hex }" />
           <span style="flex: 1; text-align: left; min-width: 0;">
+            <span v-if="!it.owned" style="font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.08em; font-size: 9px; color: var(--orange); display: block;">Wishlist</span>
             <span style="font-family: var(--font-display); font-weight: 700; font-size: 17px; display: block; line-height: 1;">{{ it.title }}</span>
             <span style="font-family: var(--font-cond); font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;">{{ it.generation === '—' ? 'Ephemera' : it.generation }} · {{ it.year }} · {{ colorOf(it).name }}</span>
           </span>
@@ -23,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import { colorOf, fmtMoney, type Item } from '~/utils/catalog'
-withDefaults(defineProps<{ candidates: Item[]; title?: string; emptyMessage?: string }>(), {
+import { colorOf, fmtMoney, type WallCard } from '~/utils/catalog'
+withDefaults(defineProps<{ candidates: WallCard[]; title?: string; emptyMessage?: string }>(), {
   title: 'Shelve a Car Here',
   emptyMessage: 'Every car is already on the wall. Drag one between slots to re-file it.',
 })
