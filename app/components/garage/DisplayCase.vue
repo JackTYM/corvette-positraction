@@ -56,20 +56,20 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, ARRANGE_LABELS, type Item } from '~/utils/catalog'
+import { fmtMoney, ARRANGE_LABELS, type WallCard } from '~/utils/catalog'
 import type { WallCase } from '~/composables/useWall'
 
 const props = defineProps<{
-  c: WallCase; index: number; order: string[]; byId: Record<string, Item>; offset: number; cap: number;
+  c: WallCase; index: number; order: string[]; byId: Record<string, WallCard>; offset: number; cap: number;
   bumped: Set<string>; dragId: string | null; canRemove: boolean;
 }>()
 const emit = defineEmits<{
-  dropSeq: [itemId: string, seq: number]; eject: [id: string]; open: [item: Item]; emptySlot: [seq: number];
+  dropSeq: [itemId: string, seq: number]; eject: [id: string]; open: [item: WallCard]; emptySlot: [seq: number];
   dragstart: [id: string]; dragend: []; arrangeCase: [index: number, key: keyof typeof ARRANGE_LABELS];
   edit: [index: number]; empty: [index: number]; remove: [index: number];
 }>()
 
-function slotItem(i: number): Item | null {
+function slotItem(i: number): WallCard | null {
   const id = props.order[props.offset + i]
   return id ? props.byId[id] ?? null : null
 }

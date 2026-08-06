@@ -1,12 +1,13 @@
 <template>
   <div
-    class="slot-car" :class="{ dragging }" draggable="true"
+    class="slot-car" :class="{ dragging, wishlist: !item.owned }" draggable="true"
     :title="`${item.title} — drag to re-file`"
     @dragstart="onDragStart" @dragend="$emit('dragend')" @click="$emit('open', item)"
   >
     <img v-if="item.imgKey" class="slot-photo" :src="`${imageBaseUrl}/${item.imgKey}`" :alt="item.title" draggable="false" />
     <div v-else class="slot-photo" style="background: var(--paper-2);" />
     <div class="slot-spine" :style="{ background: colorOf(item).hex }" />
+    <div v-if="!item.owned" style="position: absolute; top: 3px; right: 5px; z-index: 5; background: var(--ink); color: var(--paper); font-size: 8px; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 5px; font-family: var(--font-cond);">Wishlist</div>
     <div class="slot-veil">
       <div class="slot-body">
         <div class="slot-title">{{ item.title }}</div>
@@ -21,9 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { colorOf, fmtMoney, type Item } from '~/utils/catalog'
-const props = defineProps<{ item: Item; dragging: boolean }>()
-const emit = defineEmits<{ open: [item: Item]; eject: []; dragstart: [e: DragEvent]; dragend: [] }>()
+import { colorOf, fmtMoney, type WallCard } from '~/utils/catalog'
+const props = defineProps<{ item: WallCard; dragging: boolean }>()
+const emit = defineEmits<{ open: [item: WallCard]; eject: []; dragstart: [e: DragEvent]; dragend: [] }>()
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 

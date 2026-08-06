@@ -56,21 +56,26 @@
 </template>
 
 <script setup lang="ts">
-import { ARRANGE, ARRANGE_LABELS, isCar, type Item } from '~/utils/catalog'
+import { ARRANGE, ARRANGE_LABELS, isCar, wishlistItemAsCard, type WallCard } from '~/utils/catalog'
 import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice } from '~/utils/wallOps'
 import type { WallCase } from '~/composables/useWall'
 
 const { items, fetchAll } = useItems()
+const { items: wishlistItems, fetchAll: fetchWishlistAll } = useWishlist()
 const { wall, fetchWall, saveWall } = useWall()
 try {
   if (!items.value.length) await fetchAll()
+  if (!wishlistItems.value.length) await fetchWishlistAll()
   await fetchWall()
 } catch (err) {
   console.warn('Failed to load items/wall for the Garage page:', err)
 }
 
 const cases = computed(() => wall.value.cases)
-const carItems = computed(() => items.value.filter(isCar))
+const carItems = computed<WallCard[]>(() => [
+  ...items.value.filter(isCar).map((i) => ({ ...i, owned: true })),
+  ...wishlistItems.value.map((w) => ({ ...wishlistItemAsCard(w), owned: false })),
+])
 const byId = computed(() => Object.fromEntries(carItems.value.map((i) => [i.id, i])))
 const order = computed(() => wall.value.order.filter((id) => byId.value[id]))
 
@@ -81,7 +86,7 @@ const totalCap = computed(() => caps.value.reduce((a, b) => a + b, 0))
 const placed = computed(() => new Set(order.value))
 const unplaced = computed(() => carItems.value.filter((i) => !placed.value.has(i.id)))
 const overflow = computed(() => order.value.slice(totalCap.value).map((id) => byId.value[id]))
-const loose = computed<Item[]>(() => [...overflow.value, ...unplaced.value])
+const loose = computed<WallCard[]>(() => [...overflow.value, ...unplaced.value])
 
 const dragId = ref<string | null>(null)
 const bumped = ref<Set<string>>(new Set())
@@ -153,5 +158,5 @@ async function removeCase(ci: number) {
 const pickSeq = ref<number | null>(null)
 const arrangeKeys = Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]
 
-function openItem(item: Item) { navigateTo(`/collection/${item.id}`) }
+function openItem(item: WallCard) { navigateTo(item.owned ? `/collection/${item.id}` : `/wishlist/${item.id}`) }
 </script>
