@@ -9,7 +9,7 @@
         <div v-if="candidates.length === 0" style="padding: 30px 20px; text-align: center; font-style: italic; color: var(--muted);">
           {{ emptyMessage }}
         </div>
-        <button v-for="it in candidates" :key="it.id" class="pick-row" @click="$emit('pick', it.id)">
+        <button v-for="it in candidates" :key="it.id" class="pick-row" :class="{ wishlist: !it.owned }" @click="$emit('pick', it.id)">
           <span class="pick-swatch" :style="{ background: colorOf(it).hex }" />
           <span style="flex: 1; text-align: left; min-width: 0;">
             <span v-if="!it.owned" style="font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.08em; font-size: 9px; color: var(--orange); display: block;">Wishlist</span>

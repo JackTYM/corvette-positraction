@@ -298,6 +298,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
   background: transparent; cursor: pointer; transition: background 0.1s;
 }
 .pick-row:hover { background: var(--paper-2); }
+.pick-row.wishlist { border-left: 3px dashed var(--orange-deep); }
 
 .print-only { display: none; }
 
