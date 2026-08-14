@@ -23,9 +23,14 @@ export function useAuth() {
 
   async function signUp(email: string, password: string, name?: string) {
     try {
-      const { data, error } = await neon.auth.signUp.email({ email, password, name: name ?? '' })
+      // See signIn() below: use the user this response already returns instead of an extra
+      // getSession() round trip, which can lose the race on iOS home-screen standalone PWAs.
+      const { data, error } = await neon.auth.signUp.email(
+        { email, password, name: name ?? '' },
+        { signal: AbortSignal.timeout(10_000) },
+      )
       if (error) return { error }
-      await refreshSession()
+      user.value = data.user
       return { data }
     } catch (err) {
       return { error: toAuthError(err) }
@@ -34,9 +39,13 @@ export function useAuth() {
 
   async function signIn(email: string, password: string) {
     try {
-      const { data, error } = await neon.auth.signIn.email({ email, password })
+      // Use the user this response already returns instead of an extra getSession() round
+      // trip: on iOS home-screen standalone PWAs that follow-up request can race ahead of
+      // the session actually being persisted and come back empty, silently bouncing back to
+      // the sign-in page even though sign-in itself succeeded.
+      const { data, error } = await neon.auth.signIn.email({ email, password }, { signal: AbortSignal.timeout(10_000) })
       if (error) return { error }
-      await refreshSession()
+      user.value = data.user
       return { data }
     } catch (err) {
       return { error: toAuthError(err) }
