@@ -160,11 +160,16 @@
       </div>
     </div>
 
-    <div class="no-print" style="display: flex; gap: 12px; margin-top: 22px; justify-content: flex-end;">
-      <NuxtLink to="/" class="btn ghost">Discard</NuxtLink>
-      <button class="btn primary" :disabled="!valid || saving || importingReferencePhoto" :style="{ opacity: valid && !saving && !importingReferencePhoto ? 1 : 0.45, pointerEvents: valid && !saving && !importingReferencePhoto ? 'auto' : 'none' }" @click="onSave">
-        {{ saving ? 'Filing…' : importingReferencePhoto ? 'Importing photo…' : editingItemId ? '✓ Save Changes' : '✓ File This Card' }}
-      </button>
+    <div class="no-print" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 22px;">
+      <p v-if="!saving && (blockReasons.length || importingReferencePhoto)" style="color: var(--orange); font-size: 12.5px; font-style: italic; margin: 0;">
+        {{ importingReferencePhoto ? 'Still importing the reference photo — the card can be filed once that finishes.' : blockReasons.join(' ') }}
+      </p>
+      <div style="display: flex; gap: 12px;">
+        <NuxtLink to="/" class="btn ghost">Discard</NuxtLink>
+        <button class="btn primary" :disabled="!valid || saving || importingReferencePhoto" :style="{ opacity: valid && !saving && !importingReferencePhoto ? 1 : 0.45, pointerEvents: valid && !saving && !importingReferencePhoto ? 'auto' : 'none' }" @click="onSave">
+          {{ saving ? 'Filing…' : importingReferencePhoto ? 'Importing photo…' : editingItemId ? '✓ Save Changes' : '✓ File This Card' }}
+        </button>
+      </div>
     </div>
 
     <SlotPicker v-if="showLinkPicker" title="Link an Entry" empty-message="No other items to link yet." :candidates="linkCandidates" @close="showLinkPicker = false" @pick="addPendingLink" />
@@ -427,6 +432,12 @@ function removePendingLink(id: string) {
 }
 
 const valid = computed(() => form.title.trim().length > 0 && String(form.year).trim().length > 0)
+const blockReasons = computed(() => {
+  const reasons: string[] = []
+  if (!form.title.trim()) reasons.push('Item Title is required.')
+  if (!String(form.year).trim()) reasons.push('Year is required.')
+  return reasons
+})
 const saving = ref(false)
 
 async function onSave() {
