@@ -3,7 +3,7 @@
     <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Reference</div>
     <h2 style="font-size: clamp(38px, 6.5vw, 68px); line-height: 0.9; margin-bottom: 18px;">Diecast Reference</h2>
     <p style="font-style: italic; color: var(--muted); font-size: 16.5px; margin: 0 0 24px; max-width: 640px;">
-      Every known diecast Corvette release, sourced from <a href="https://smalldiecastcorvettes.com" target="_blank" rel="noopener">smalldiecastcorvettes.com</a>. Click a picture to add it to your archive.
+      Every known diecast Corvette release, sourced from <a href="https://smalldiecastcorvettes.com" target="_blank" rel="noopener">smalldiecastcorvettes.com</a>. Click a picture to add it to your collection or wishlist.
     </p>
 
     <div v-if="manufacturers.length" class="no-print" style="display: flex; flex-wrap: wrap; row-gap: 6px; column-gap: 8px; border-bottom: 2px solid var(--ink); margin-bottom: 24px;">
@@ -39,23 +39,29 @@
       <div class="mag-grid">
         <div v-for="v in variantsByModel[model.id] ?? []" :key="v.id" class="editorial-card">
           <NuxtLink
-            :to="addedLookup.get(v.id) ? (addedLookup.get(v.id)?.type === 'collection' ? `/collection/${addedLookup.get(v.id)?.id}` : `/wishlist/${addedLookup.get(v.id)?.id}`) : `/add?fromVariant=${v.id}`"
+            v-if="addedLookup.get(v.id)"
+            :to="addedLookup.get(v.id)?.type === 'collection' ? `/collection/${addedLookup.get(v.id)?.id}` : `/wishlist/${addedLookup.get(v.id)?.id}`"
             style="text-decoration: none; color: inherit; display: block;"
           >
             <div class="editorial-card-photo photo-frame">
               <img :src="v.imageUrl" :alt="v.caption || model.name" class="editorial-card-img" />
-              <div
-                v-if="addedLookup.get(v.id)"
-                style="position: absolute; top: 8px; left: 8px; background: var(--ink); color: var(--paper); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 7px; font-family: var(--font-cond);"
-              >
+              <div style="position: absolute; top: 8px; left: 8px; background: var(--ink); color: var(--paper); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 7px; font-family: var(--font-cond);">
                 {{ addedLookup.get(v.id)?.type === 'collection' ? 'In Collection' : 'In Wishlist' }}
               </div>
             </div>
             <div style="padding: 10px 12px; font-size: 13.5px; line-height: 1.4;">
               <p v-if="v.caption" style="margin: 0 0 8px;">{{ v.caption }}</p>
-              <span v-if="addedLookup.get(v.id)" class="btn ghost" style="font-size: 11px; padding: 5px 10px; display: inline-block;">{{ addedLookup.get(v.id)?.type === 'collection' ? 'View Collection →' : 'View Wishlist →' }}</span>
+              <span class="btn ghost" style="font-size: 11px; padding: 5px 10px; display: inline-block;">{{ addedLookup.get(v.id)?.type === 'collection' ? 'View Collection →' : 'View Wishlist →' }}</span>
             </div>
           </NuxtLink>
+          <div v-else role="button" tabindex="0" style="cursor: pointer;" @click="openChooser(v, model)" @keydown.enter="openChooser(v, model)" @keydown.space.prevent="openChooser(v, model)">
+            <div class="editorial-card-photo photo-frame">
+              <img :src="v.imageUrl" :alt="v.caption || model.name" class="editorial-card-img" />
+            </div>
+            <div style="padding: 10px 12px; font-size: 13.5px; line-height: 1.4;">
+              <p v-if="v.caption" style="margin: 0;">{{ v.caption }}</p>
+            </div>
+          </div>
           <div v-if="!addedLookup.get(v.id)" class="no-print" style="padding: 0 12px 12px; display: flex; gap: 8px;">
             <NuxtLink :to="`/add?fromVariant=${v.id}`" class="btn primary" style="font-size: 11px; padding: 5px 10px;">Index</NuxtLink>
             <button
@@ -71,6 +77,7 @@
     </div>
     <p v-if="!loadingModels && models.length === 0" style="font-style: italic; color: var(--muted);">No reference models yet — run the scraper.</p>
     <p v-if="!loadingModels && models.length > 0 && modelsForActiveTab.length === 0" style="font-style: italic; color: var(--muted);">No {{ activeGeneration === 'All' ? '' : (activeGeneration === '—' ? 'unknown-generation ' : activeGeneration + ' ') }}models for {{ activeManufacturer }}.</p>
+    <ReferenceAddChooser v-if="chooserTarget" :busy="wishlistBusy.has(chooserTarget.variant.id)" @collection="chooseCollection" @wishlist="chooseWishlist" @close="chooserTarget = null" />
   </div>
 </template>
 
@@ -194,6 +201,23 @@ watch(modelsForActiveTab, async (modelsInTab) => {
     }
   }
 }, { immediate: true })
+
+const chooserTarget = ref<{ variant: DiecastVariant; model: DiecastModel } | null>(null)
+function openChooser(variant: DiecastVariant, model: DiecastModel) {
+  chooserTarget.value = { variant, model }
+}
+function chooseCollection() {
+  if (!chooserTarget.value) return
+  const { variant } = chooserTarget.value
+  chooserTarget.value = null
+  navigateTo(`/add?fromVariant=${variant.id}`)
+}
+async function chooseWishlist() {
+  if (!chooserTarget.value) return
+  const { variant, model } = chooserTarget.value
+  await addToWishlist(variant, model)
+  chooserTarget.value = null
+}
 
 async function addToWishlist(variant: DiecastVariant, model: DiecastModel) {
   if (wishlistBusy.value.has(variant.id)) return
