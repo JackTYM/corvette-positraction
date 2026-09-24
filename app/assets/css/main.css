@@ -214,8 +214,11 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .slot-code {
   position: absolute; bottom: 3px; left: 5px; z-index: 3;
   font-family: var(--font-cond); font-size: 9px; letter-spacing: 0.06em;
-  color: var(--muted); opacity: 0.65; pointer-events: none;
+  color: var(--muted); opacity: 0.65; pointer-events: none; transition: opacity 0.14s ease;
 }
+/* The hover veil's title/meta text lands in this same bottom-left corner -- fade the
+   location code out while it's showing so the two don't visually mix. */
+.slot:has(.slot-car:hover) .slot-code { opacity: 0; }
 .case-name { cursor: pointer; }
 .case-name:hover { text-decoration: underline; text-decoration-color: var(--orange); }
 .slot.empty {
