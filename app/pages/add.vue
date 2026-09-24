@@ -39,9 +39,15 @@
         <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">General</div>
         <div class="index-card-grid">
           <label>
+            <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Collection</span>
+            <select v-model="formCollection" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.08em;">
+              <option v-for="c in COLLECTION_NAMES" :key="c" :value="c">{{ c }}</option>
+            </select>
+          </label>
+          <label v-if="collectionCategories.length > 1">
             <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Category</span>
             <select v-model="form.category" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16.5px; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.08em;">
-              <option v-for="c in categoryKeys" :key="c" :value="c">{{ c }}</option>
+              <option v-for="c in collectionCategories" :key="c" :value="c">{{ c }}</option>
             </select>
           </label>
           <label>
@@ -178,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { CATEGORIES, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, extractYearFromName, type Category, type Generation, type FieldDef, type Item } from '~/utils/catalog'
+import { CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, GENERATIONS, GEN_ORDER, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, extractYearFromName, COLLECTIONS, COLLECTION_NAMES, collectionOf, type Category, type Collection, type Generation, type FieldDef, type Item } from '~/utils/catalog'
 
 // This page's setup logic reads route.query (fromVariant/fromWishlist/edit) once, at the
 // top level, to prefill the form -- forcing a remount on every query change is what makes
@@ -194,7 +200,6 @@ const { create: createLink } = useItemLinks()
 const { items: wishlistItemsForConvert, fetchAll: fetchWishlistItemsForConvert, remove: removeConvertedWishlistItem } = useWishlist()
 const cfg = useRuntimeConfig()
 
-const categoryKeys = Object.keys(CATEGORIES) as Category[]
 const genOptions = GEN_ORDER
 
 function freshAttributes(c: Category): Record<string, unknown> {
@@ -233,6 +238,17 @@ watch(() => form.category, (c) => {
   if (!CATEGORY_HAS_GENERATION[c]) form.generation = '—'
   else if (form.generation === '—') form.generation = 'C2'
   form.attributes = freshAttributes(c)
+})
+
+const formCollection = ref<Collection>(collectionOf(form.category))
+const collectionCategories = computed(() => COLLECTIONS[formCollection.value])
+
+// Picking a collection with exactly one category sets it immediately. For "Other"
+// (currently the only multi-category collection) the Category dropdown lets the
+// user pick within it; switching away from Other and back defaults to its first category.
+watch(formCollection, (name) => {
+  const cats = COLLECTIONS[name]
+  if (cats.length === 1 || !cats.includes(form.category)) form.category = cats[0]!
 })
 
 const pendingFile = ref<File | null>(null)
@@ -328,6 +344,7 @@ if (typeof editQuery === 'string') {
       form.title = existing.title
       form.sub = existing.sub
       form.category = existing.category
+      formCollection.value = collectionOf(existing.category)
       // form.category's watcher resets generation/attributes to category defaults --
       // wait for that to flush, then overwrite with the item's real saved values so
       // editing doesn't silently blank out its category-specific fields.
