@@ -1,7 +1,7 @@
 <template>
-  <div class="wrap" style="padding: 34px 26px 70px;">
-    <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section One</div>
-    <h2 style="font-size: clamp(38px, 6.5vw, 68px); line-height: 0.9; margin-bottom: 18px;">The Collection</h2>
+  <div class="wrap" style="padding: 20px 26px 70px;">
+    <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">Section One</div>
+    <h2 style="font-size: clamp(30px, 4.5vw, 44px); line-height: 0.95; margin-bottom: 12px;">The Collection</h2>
 
     <div class="no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px;">
       <span class="kicker" style="color: var(--muted); font-size: 10px; margin-right: 2px;">Sort by</span>

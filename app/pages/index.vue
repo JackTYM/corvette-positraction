@@ -1,16 +1,16 @@
 <template>
-  <div class="wrap" style="padding: 34px 26px 70px;">
+  <div class="wrap" style="padding: 20px 26px 70px;">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
       <div>
-        <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">In This Issue</div>
-        <h2 style="font-size: clamp(40px, 7vw, 76px); line-height: 0.9;">Table of<br />Contents</h2>
+        <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">In This Issue</div>
+        <h2 style="font-size: clamp(30px, 4.5vw, 44px); line-height: 0.95; white-space: nowrap;">Table of Contents</h2>
       </div>
-      <p style="max-width: 360px; font-style: italic; color: var(--ink-soft); font-size: 16.5px; line-height: 1.45; margin: 0;">
+      <p style="max-width: 360px; font-style: italic; color: var(--ink-soft); font-size: 15px; line-height: 1.4; margin: 0;">
         A working archive of one lifetime spent chasing the plastic, paper, and porcelain of America's sports car — 1953 to the present day.
       </p>
     </div>
 
-    <hr class="rule-thick" style="margin: 26px 0 0;" />
+    <hr class="rule-thick" style="margin: 16px 0 0;" />
     <HalftoneBand color="var(--ink)" :height="9" opacity="calc(var(--halftone) * 0.5)" />
 
     <div class="figures-ledger">

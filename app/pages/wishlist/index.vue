@@ -1,8 +1,8 @@
 <template>
-  <div class="wrap" style="padding: 34px 26px 70px;">
-    <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Section Three</div>
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px;">
-      <h2 style="font-size: clamp(38px, 6.5vw, 68px); line-height: 0.9;">Wishlist</h2>
+  <div class="wrap" style="padding: 20px 26px 70px;">
+    <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">Section Three</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+      <h2 style="font-size: clamp(30px, 4.5vw, 44px); line-height: 0.95;">Wishlist</h2>
       <button class="btn primary no-print" @click="showModal = true">+ Add to Wishlist</button>
     </div>
 
