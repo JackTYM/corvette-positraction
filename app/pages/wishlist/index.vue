@@ -9,7 +9,7 @@
     <div v-if="items.length > 1" class="no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px;">
       <span class="kicker" style="color: var(--muted); font-size: 10px; margin-right: 2px;">Sort by</span>
       <button
-        v-for="k in sortKeys" :key="k" class="link-tab whole-wall-tab" :class="{ suggested: k === 'release', active: k === activeSort }"
+        v-for="k in sortKeys" :key="k" class="link-tab whole-wall-tab" :class="{ suggested: k === 'entered', active: k === activeSort }"
         @click="activeSort = k"
       >{{ ARRANGE_LABELS[k] }}</button>
     </div>
@@ -48,8 +48,8 @@ if (!items.value.length) {
   }
 }
 
-const sortKeys: (keyof typeof ARRANGE_LABELS)[] = ['release', 'date', 'value']
-const activeSort = ref<keyof typeof ARRANGE_LABELS>('release')
+const sortKeys: (keyof typeof ARRANGE_LABELS)[] = ['entered', 'release', 'date', 'value']
+const activeSort = ref<keyof typeof ARRANGE_LABELS>('entered')
 const sortedItems = computed(() =>
   [...items.value].sort((a, b) => ARRANGE[activeSort.value](wishlistItemAsCard(a), wishlistItemAsCard(b))),
 )

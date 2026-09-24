@@ -156,7 +156,7 @@ async function removeCase(ci: number) {
 }
 
 const pickSeq = ref<number | null>(null)
-const arrangeKeys = Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]
+const arrangeKeys = (Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]).filter((k) => k !== 'entered')
 
 function openItem(item: WallCard) { navigateTo(item.owned ? `/collection/${item.id}` : `/wishlist/${item.id}`) }
 </script>

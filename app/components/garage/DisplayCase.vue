@@ -81,7 +81,7 @@ const parkedValue = computed(() =>
 )
 
 const sortOpen = ref(false)
-const arrangeKeys = Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]
+const arrangeKeys = (Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]).filter((k) => k !== 'entered')
 function onArrange(k: keyof typeof ARRANGE_LABELS) { emit('arrangeCase', props.index, k); sortOpen.value = false }
 
 const zoom = ref<number | null>(null)

@@ -53,7 +53,7 @@ export function useWishlist() {
 
   async function fetchAll() {
     loading.value = true
-    const { data, error } = await neon.from('wishlist_items').select('*').order('created_at', { ascending: false })
+    const { data, error } = await neon.from('wishlist_items').select('*').order('created_at', { ascending: true })
     loading.value = false
     if (error) throw error
     items.value = (data as WishlistItemRow[]).map(fromWishlistRow)
@@ -63,7 +63,7 @@ export function useWishlist() {
     const { data, error } = await neon.from('wishlist_items').insert(wishlistToPatch(input)).select().single()
     if (error) throw error
     const item = fromWishlistRow(data as WishlistItemRow)
-    items.value = [item, ...items.value]
+    items.value = [...items.value, item]
     return item
   }
 

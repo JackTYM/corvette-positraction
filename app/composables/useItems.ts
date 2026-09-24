@@ -95,7 +95,7 @@ export function useItems() {
 
   async function fetchAll() {
     loading.value = true
-    const { data, error } = await neon.from('items').select('*').order('created_at', { ascending: false })
+    const { data, error } = await neon.from('items').select('*').order('created_at', { ascending: true })
     loading.value = false
     if (error) throw error
     items.value = (data as ItemRow[]).map(fromRow)
@@ -105,7 +105,7 @@ export function useItems() {
     const { data, error } = await neon.from('items').insert(toPatch(input)).select().single()
     if (error) throw error
     const item = fromRow(data as ItemRow)
-    items.value = [item, ...items.value]
+    items.value = [...items.value, item]
     return item
   }
 

@@ -6,7 +6,7 @@
     <div class="no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px;">
       <span class="kicker" style="color: var(--muted); font-size: 10px; margin-right: 2px;">Sort by</span>
       <button
-        v-for="k in sortKeys" :key="k" class="link-tab whole-wall-tab" :class="{ suggested: k === 'release', active: k === activeSort }"
+        v-for="k in sortKeys" :key="k" class="link-tab whole-wall-tab" :class="{ suggested: k === 'entered', active: k === activeSort }"
         @click="activeSort = k"
       >{{ ARRANGE_LABELS[k] }}</button>
     </div>
@@ -26,7 +26,7 @@ try {
 }
 
 const sortKeys = Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]
-const activeSort = ref<keyof typeof ARRANGE_LABELS>('release')
+const activeSort = ref<keyof typeof ARRANGE_LABELS>('entered')
 const sortedItems = computed(() => [...items.value].sort(ARRANGE[activeSort.value]))
 
 function openItem(item: Item) { navigateTo(`/collection/${item.id}`) }

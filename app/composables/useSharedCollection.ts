@@ -10,13 +10,13 @@ export function useSharedCollection(userId: string) {
   const wishlistItems = useState<WishlistItem[]>(`shared:${userId}:wishlist`, () => [])
 
   async function fetchItems() {
-    const { data, error } = await neon.from('items').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+    const { data, error } = await neon.from('items').select('*').eq('user_id', userId).order('created_at', { ascending: true })
     if (error) throw error
     items.value = (data as ItemRow[]).map(fromRow)
   }
 
   async function fetchWishlistItems() {
-    const { data, error } = await neon.from('wishlist_items').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+    const { data, error } = await neon.from('wishlist_items').select('*').eq('user_id', userId).order('created_at', { ascending: true })
     if (error) throw error
     wishlistItems.value = (data as WishlistItemRow[]).map(fromWishlistRow)
   }
