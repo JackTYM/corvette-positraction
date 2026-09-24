@@ -14,14 +14,14 @@ export const GENERATIONS: Record<Exclude<Generation,'—'>, { years: string; nam
 export type Category =
   | 'DIECAST' | 'BROCHURE' | 'ADVERTISEMENT' | 'BADGE' | 'PATCH' | 'PHOTO' | 'BOOK' | 'ART'
   | 'SPECIALTY CAR' | 'OTHER COLLECTABLES' | 'INSTRUCTIONAL CD' | 'MUSIC CD' | 'LITHOGRAPHIC TIN'
-  | 'MAGAZINE' | 'AUTO PART' | 'OWNERS MANUAL'
+  | 'MAGAZINE' | 'AUTO PART' | 'OWNERS MANUAL' | 'HUBCAP'
 
 export const CATEGORIES: Record<Category, 'orange'|'ink'> = {
   'DIECAST': 'orange', 'BROCHURE': 'ink', 'ADVERTISEMENT': 'orange', 'BADGE': 'ink',
   'PATCH': 'orange', 'PHOTO': 'ink', 'BOOK': 'orange', 'ART': 'ink',
   'SPECIALTY CAR': 'orange', 'OTHER COLLECTABLES': 'ink', 'INSTRUCTIONAL CD': 'orange',
   'MUSIC CD': 'ink', 'LITHOGRAPHIC TIN': 'orange', 'MAGAZINE': 'ink', 'AUTO PART': 'orange',
-  'OWNERS MANUAL': 'ink',
+  'OWNERS MANUAL': 'ink', 'HUBCAP': 'orange',
 }
 
 export interface Item {
@@ -199,6 +199,27 @@ export const CAR_CATEGORIES: Category[] = ['DIECAST', 'SPECIALTY CAR']
 export const isCar = (item: Pick<Item,'category'> | null | undefined): boolean =>
   !!item && CAR_CATEGORIES.includes(item.category)
 
+export type Collection = 'Diecast' | 'Specialty Cars' | 'Other' | 'Auto Parts' | 'Hubcaps'
+export const COLLECTION_NAMES: Collection[] = ['Diecast', 'Specialty Cars', 'Other', 'Auto Parts', 'Hubcaps']
+
+export const COLLECTIONS: Record<Collection, Category[]> = {
+  'Diecast': ['DIECAST'],
+  'Specialty Cars': ['SPECIALTY CAR'],
+  'Other': [
+    'BROCHURE', 'ADVERTISEMENT', 'BADGE', 'PATCH', 'PHOTO', 'BOOK', 'ART',
+    'OTHER COLLECTABLES', 'INSTRUCTIONAL CD', 'MUSIC CD', 'LITHOGRAPHIC TIN', 'MAGAZINE', 'OWNERS MANUAL',
+  ],
+  'Auto Parts': ['AUTO PART'],
+  'Hubcaps': ['HUBCAP'],
+}
+
+export function collectionOf(category: Category): Collection {
+  for (const name of COLLECTION_NAMES) {
+    if (COLLECTIONS[name].includes(category)) return name
+  }
+  return 'Other'
+}
+
 export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox'
 export interface FieldDef {
   key: string
@@ -214,7 +235,7 @@ export const CATEGORY_HAS_GENERATION: Record<Category, boolean> = {
   'DIECAST': true, 'BROCHURE': true, 'ADVERTISEMENT': true, 'BADGE': true, 'PATCH': true,
   'PHOTO': true, 'BOOK': true, 'ART': false, 'SPECIALTY CAR': true, 'OTHER COLLECTABLES': false,
   'INSTRUCTIONAL CD': true, 'MUSIC CD': true, 'LITHOGRAPHIC TIN': true, 'MAGAZINE': false,
-  'AUTO PART': true, 'OWNERS MANUAL': false,
+  'AUTO PART': true, 'OWNERS MANUAL': false, 'HUBCAP': true,
 }
 
 export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
@@ -306,6 +327,7 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
   'OWNERS MANUAL': [
     { key: 'originalOwner', label: 'Original Owner', type: 'text' },
   ],
+  'HUBCAP': [],
 }
 
 // --- Collection page filtering -------------------------------------------------

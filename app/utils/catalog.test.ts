@@ -5,6 +5,7 @@ import {
   deriveGeneration, compareByGeneration, type Generation,
   type FieldDef,
   type WallCard, wishlistItemAsCard,
+  CATEGORIES, type Category, COLLECTIONS, collectionOf,
 } from './catalog'
 
 function item(overrides: Partial<Item>): Item {
@@ -71,6 +72,37 @@ describe('isCar', () => {
   })
   it('is false for paper ephemera', () => {
     expect(isCar(item({ category: 'BROCHURE' }))).toBe(false)
+  })
+})
+
+describe('COLLECTIONS / collectionOf', () => {
+  it('partitions every category into exactly one collection, with no gaps or overlaps', () => {
+    const allCategories = Object.keys(CATEGORIES) as Category[]
+    const seen = new Set<Category>()
+    for (const cats of Object.values(COLLECTIONS)) {
+      for (const c of cats) {
+        expect(seen.has(c)).toBe(false)
+        seen.add(c)
+      }
+    }
+    expect([...seen].sort()).toEqual([...allCategories].sort())
+  })
+  it('maps HUBCAP to the Hubcaps collection', () => {
+    expect(collectionOf('HUBCAP')).toBe('Hubcaps')
+  })
+  it('maps SPECIALTY CAR to its own collection, not Diecast', () => {
+    expect(collectionOf('SPECIALTY CAR')).toBe('Specialty Cars')
+  })
+  it('maps DIECAST to Diecast', () => {
+    expect(collectionOf('DIECAST')).toBe('Diecast')
+  })
+  it('maps AUTO PART to Auto Parts', () => {
+    expect(collectionOf('AUTO PART')).toBe('Auto Parts')
+  })
+  it('maps BROCHURE (and other non-car, non-part, non-hubcap categories) to Other', () => {
+    expect(collectionOf('BROCHURE')).toBe('Other')
+    expect(collectionOf('BOOK')).toBe('Other')
+    expect(collectionOf('MAGAZINE')).toBe('Other')
   })
 })
 
