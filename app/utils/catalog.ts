@@ -185,7 +185,7 @@ export function compareByGeneration(a: { generation: Generation; year: number | 
 
 type Comparator = (a: Item, b: Item) => number
 export const ARRANGE: Record<'entered'|'release'|'date'|'generation'|'color'|'category'|'value', Comparator> = {
-  entered: (a, b) => String(a.createdAt).localeCompare(String(b.createdAt)),
+  entered: (a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')),
   release: (a, b) => (Number(a.year) || 0) - (Number(b.year) || 0) || genIndex(a) - genIndex(b) || String(a.title).localeCompare(String(b.title)),
   date: (a, b) => String(a.acquired || '').localeCompare(String(b.acquired || '')),
   generation: (a, b) => genIndex(a) - genIndex(b) || (Number(a.year) || 0) - (Number(b.year) || 0),
