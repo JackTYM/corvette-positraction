@@ -240,12 +240,19 @@ watch(() => form.category, (c) => {
   form.attributes = freshAttributes(c)
 })
 
+// formCollection only flows one way, into form.category (below, and in the edit-prefill
+// block) -- it is not derived FROM form.category on every change. Any future code path
+// that sets form.category directly (a duplicate-item feature, a reset helper, etc.) must
+// also set formCollection, or the Collection dropdown will silently desync from the
+// actual saved category.
 const formCollection = ref<Collection>(collectionOf(form.category))
 const collectionCategories = computed(() => COLLECTIONS[formCollection.value])
 
 // Picking a collection with exactly one category sets it immediately. For "Other"
 // (currently the only multi-category collection) the Category dropdown lets the
 // user pick within it; switching away from Other and back defaults to its first category.
+// Note: assigning form.category here also re-triggers the form.category watcher above,
+// which resets form.generation/form.attributes to the new category's defaults.
 watch(formCollection, (name) => {
   const cats = COLLECTIONS[name]
   if (cats.length === 1 || !cats.includes(form.category)) form.category = cats[0]!
