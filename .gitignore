@@ -25,3 +25,6 @@ logs
 
 # Git worktrees
 .worktrees
+
+# Local planning scratch (brainstorming/writing-plans)
+docs/superpowers/
