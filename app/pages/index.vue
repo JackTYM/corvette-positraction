@@ -32,7 +32,7 @@
             <div class="featured-value"><ValueNote :value="featured.value" :size="44" /></div>
           </div>
           <div style="padding: 18px 20px 20px;">
-            <div class="kicker" style="color: var(--orange); margin-bottom: 7px;">{{ featured.year }} · {{ featured.generation }} · {{ featured.maker }}</div>
+            <div class="kicker" style="color: var(--orange); margin-bottom: 7px;">{{ CAR_CATEGORIES.includes(featured.category) ? `${featured.year} · ${featured.generation} · ${featured.maker}` : `${featured.year} · ${featured.generation}` }}</div>
             <h3 style="font-size: 34px; line-height: 0.95; margin-bottom: 8px;">{{ featured.title }}</h3>
             <p style="font-size: 16px; line-height: 1.5; color: var(--ink-soft); margin: 0;">{{ featured.story }}</p>
             <div class="btn ghost" style="margin-top: 16px; border-color: var(--ink); pointer-events: none;">Read the full entry →</div>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { stats, fmtMoney, type Item } from '~/utils/catalog'
+import { stats, fmtMoney, CAR_CATEGORIES, type Item } from '~/utils/catalog'
 
 const { items, fetchAll } = useItems()
 const { wall, fetchWall } = useWall()

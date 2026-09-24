@@ -17,7 +17,7 @@
       </div>
 
       <div>
-        <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">{{ item.year }} · {{ item.maker }}</div>
+        <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">{{ CAR_CATEGORIES.includes(item.category) ? `${item.year} · ${item.maker}` : item.year }}</div>
         <h2 style="font-size: clamp(34px, 5vw, 52px); line-height: 0.92;">{{ item.title }}</h2>
         <p style="font-style: italic; color: var(--muted); font-size: 18px; margin: 10px 0 0;">{{ item.sub }}</p>
 

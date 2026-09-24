@@ -10,7 +10,7 @@
     <div class="editorial-card-body">
       <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 6px;">
         <span class="color-swatch" :style="{ background: colorOf(item).hex }" :title="colorOf(item).name" />
-        <span class="kicker" style="color: var(--orange);">{{ item.year }} · {{ item.maker }}</span>
+        <span class="kicker" style="color: var(--orange);">{{ CAR_CATEGORIES.includes(item.category) ? `${item.year} · ${item.maker}` : item.year }}</span>
       </div>
       <h3 style="font-size: 24px; line-height: 0.96; margin-bottom: 6px;">{{ item.title }}</h3>
       <p style="font-style: italic; color: var(--muted); font-size: 14.5px; margin: 0; line-height: 1.3;">{{ item.sub }}</p>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { colorOf, type Item } from '~/utils/catalog'
+import { colorOf, CAR_CATEGORIES, type Item } from '~/utils/catalog'
 const props = defineProps<{ item: Item }>()
 defineEmits<{ open: [item: Item] }>()
 const cfg = useRuntimeConfig()
