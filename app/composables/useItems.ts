@@ -56,6 +56,7 @@ export function fromRow(row: ItemRow): Item {
     productionDate: row.production_date ?? '',
     rarity: row.rarity ?? null,
     attributes: row.attributes ?? {},
+    createdAt: row.created_at,
   }
 }
 

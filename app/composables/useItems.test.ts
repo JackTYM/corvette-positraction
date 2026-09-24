@@ -22,6 +22,7 @@ describe('fromRow', () => {
       colorName: 'Riverside Red', colorHex: '#B11A1A', imgKey: 'user-1/abc.webp',
       sourceVariantId: null,
       productionDate: '1963-06-01', rarity: 2, attributes: { toyNumber: 'HW-12' },
+      createdAt: '2020-01-01T00:00:00Z',
     })
   })
   it('defaults null price/value/attributes to 0/empty and null img_key stays null', () => {

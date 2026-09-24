@@ -14,7 +14,8 @@ function item(overrides: Partial<Item>): Item {
     scale: '1:18', maker: 'M', acquired: '2020-01-01', pricePaid: 10, value: 20,
     valueAsOf: '', valueSource: '', productionDate: '', rarity: null,
     condition: '', location: '', story: '', featured: false,
-    colorName: 'Red', colorHex: '#B11A1A', imgKey: null, attributes: {}, sourceVariantId: null, ...overrides,
+    colorName: 'Red', colorHex: '#B11A1A', imgKey: null, attributes: {}, sourceVariantId: null,
+    createdAt: '2020-01-01T00:00:00Z', ...overrides,
   }
 }
 
@@ -55,6 +56,16 @@ describe('ARRANGE.release', () => {
   it('sorts by year ascending', () => {
     const items = [item({ year: 1990 }), item({ year: 1963 })]
     expect([...items].sort(ARRANGE.release).map((i) => i.year)).toEqual([1963, 1990])
+  })
+})
+
+describe('ARRANGE.entered', () => {
+  it('sorts oldest createdAt first', () => {
+    const items = [
+      item({ id: 'newer', createdAt: '2024-06-01T00:00:00Z' }),
+      item({ id: 'older', createdAt: '2020-01-01T00:00:00Z' }),
+    ]
+    expect(items.sort(ARRANGE.entered).map((i) => i.id)).toEqual(['older', 'newer'])
   })
 })
 

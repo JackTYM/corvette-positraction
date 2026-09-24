@@ -49,6 +49,7 @@ export interface Item {
   imgKey: string | null
   attributes: Record<string, unknown>
   sourceVariantId: string | null
+  createdAt: string
 }
 
 export interface WallCard extends Item { owned: boolean }
@@ -112,7 +113,7 @@ export function wishlistItemAsCard(w: { id: string; title: string; estimatedPric
     scale: '', maker: '', acquired: w.createdAt.slice(0, 10), pricePaid: 0, value: w.estimatedPrice,
     valueAsOf: '', valueSource: '', productionDate: '', rarity: null, condition: '', location: '',
     story: '', featured: false, colorName: '', colorHex: '', imgKey: w.imgKey, attributes: {},
-    sourceVariantId: w.sourceVariantId,
+    sourceVariantId: w.sourceVariantId, createdAt: w.createdAt,
   }
 }
 
@@ -183,7 +184,8 @@ export function compareByGeneration(a: { generation: Generation; year: number | 
 }
 
 type Comparator = (a: Item, b: Item) => number
-export const ARRANGE: Record<'release'|'date'|'generation'|'color'|'category'|'value', Comparator> = {
+export const ARRANGE: Record<'entered'|'release'|'date'|'generation'|'color'|'category'|'value', Comparator> = {
+  entered: (a, b) => String(a.createdAt).localeCompare(String(b.createdAt)),
   release: (a, b) => (Number(a.year) || 0) - (Number(b.year) || 0) || genIndex(a) - genIndex(b) || String(a.title).localeCompare(String(b.title)),
   date: (a, b) => String(a.acquired || '').localeCompare(String(b.acquired || '')),
   generation: (a, b) => genIndex(a) - genIndex(b) || (Number(a.year) || 0) - (Number(b.year) || 0),
@@ -192,7 +194,7 @@ export const ARRANGE: Record<'release'|'date'|'generation'|'color'|'category'|'v
   value: (a, b) => (b.value || 0) - (a.value || 0),
 }
 export const ARRANGE_LABELS: Record<keyof typeof ARRANGE, string> = {
-  release: 'release year', date: 'date acquired', generation: 'generation', color: 'color', category: 'type', value: 'value',
+  entered: 'order entered', release: 'release year', date: 'date acquired', generation: 'generation', color: 'color', category: 'type', value: 'value',
 }
 
 export const CAR_CATEGORIES: Category[] = ['DIECAST', 'SPECIALTY CAR']

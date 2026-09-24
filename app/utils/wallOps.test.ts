@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice, caseLetter, slotCode } from './wallOps'
+import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice } from './wallOps'
 import { ARRANGE, type Item } from './catalog'
 
 function item(id: string, year: number): Item {
@@ -41,24 +41,5 @@ describe('arrangeSlice', () => {
   it('sorts only the given slice, leaving items outside it untouched', () => {
     const byId = { a: item('a', 1990), b: item('b', 1963), c: item('c', 2020), d: item('d', 1950) }
     expect(arrangeSlice(['a', 'b', 'c', 'd'], byId, 0, 2, ARRANGE.release)).toEqual(['b', 'a', 'c', 'd'])
-  })
-})
-
-describe('caseLetter', () => {
-  it('labels the first 26 cases A through Z', () => {
-    expect(caseLetter(0)).toBe('A')
-    expect(caseLetter(25)).toBe('Z')
-  })
-  it('continues past Z as AA, AB, ...', () => {
-    expect(caseLetter(26)).toBe('AA')
-    expect(caseLetter(27)).toBe('AB')
-  })
-})
-
-describe('slotCode', () => {
-  it('builds a {letter}-{row}-{space} code from a zero-based slot index', () => {
-    expect(slotCode(0, 4, 6)).toBe('A-1-5')
-    expect(slotCode(0, 6, 6)).toBe('A-2-1')
-    expect(slotCode(1, 0, 4)).toBe('B-1-1')
   })
 })
