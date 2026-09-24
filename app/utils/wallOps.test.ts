@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice, caseLetter, slotCode } from './wallOps'
+import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice, caseLetter, slotCode, countMoved } from './wallOps'
 import { ARRANGE, type Item } from './catalog'
 
 function item(id: string, year: number): Item {
@@ -60,5 +60,17 @@ describe('slotCode', () => {
     expect(slotCode(0, 4, 6)).toBe('A-1-5')
     expect(slotCode(0, 6, 6)).toBe('A-2-1')
     expect(slotCode(1, 0, 4)).toBe('B-1-1')
+  })
+})
+
+describe('countMoved', () => {
+  it('returns 0 when the order is unchanged', () => {
+    expect(countMoved(['a', 'b', 'c'], ['a', 'b', 'c'])).toBe(0)
+  })
+  it('counts every position whose id changed', () => {
+    expect(countMoved(['a', 'b', 'c'], ['c', 'b', 'a'])).toBe(2)
+  })
+  it('treats a position past the shorter array\'s end as changed', () => {
+    expect(countMoved(['a'], ['a', 'b'])).toBe(1)
   })
 })

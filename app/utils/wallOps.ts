@@ -51,6 +51,17 @@ export function fileByComparator(
   return moveInOrder(order, itemId, idx)
 }
 
+// Counts how many positions differ between two orderings of ids — used to tell the user
+// how many cars actually moved after a whole-wall re-file, not just "it ran".
+export function countMoved(oldOrder: string[], newOrder: string[]): number {
+  const len = Math.max(oldOrder.length, newOrder.length)
+  let count = 0
+  for (let i = 0; i < len; i++) {
+    if (oldOrder[i] !== newOrder[i]) count++
+  }
+  return count
+}
+
 export function arrangeSlice(
   order: string[], byId: Record<string, Item>, start: number, cap: number, compare: (a: Item, b: Item) => number,
 ): string[] {

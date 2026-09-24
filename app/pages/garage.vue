@@ -16,6 +16,8 @@
       <button class="btn ghost" style="padding: 7px 13px; font-size: 12px;" @click="formState = { add: true }">+ Add Case</button>
       <button v-if="order.length > 0" class="link-tab" style="font-size: 12px; padding: 6px 11px; border: 1.5px solid var(--rule); color: var(--muted);" @click="confirmEmptyWall">clear wall</button>
     </div>
+    <p class="no-print" style="font-size: 11px; color: var(--muted); margin: 4px 0 14px;">Re-orders every car across all cases and saves it.</p>
+    <p v-if="refileMessage" class="no-print" style="font-size: 12.5px; color: var(--orange); font-style: italic; margin: -8px 0 14px;">{{ refileMessage }}</p>
 
     <div v-if="overflow.length > 0" class="wall-warn no-print">
       <span>▲ {{ overflow.length }} car{{ overflow.length > 1 ? 's' : '' }} won't fit — add a case or make one bigger.</span>
@@ -57,7 +59,7 @@
 
 <script setup lang="ts">
 import { ARRANGE, ARRANGE_LABELS, isCar, wishlistItemAsCard, type WallCard } from '~/utils/catalog'
-import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice } from '~/utils/wallOps'
+import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice, countMoved } from '~/utils/wallOps'
 import type { WallCase } from '~/composables/useWall'
 
 const { items, fetchAll } = useItems()
@@ -120,10 +122,17 @@ async function fileByYear(itemId: string) {
 async function fileAllByYear() {
   for (const it of loose.value) await fileByYear(it.id)
 }
+const refileMessage = ref<string | null>(null)
+let refileMessageTimer: ReturnType<typeof setTimeout> | null = null
 async function arrangeWall(key: keyof typeof ARRANGE_LABELS) {
+  const before = order.value
   const sorted = [...carItems.value].sort(ARRANGE[key]).map((i) => i.id)
   await setOrder(sorted)
   bump(sorted)
+  const moved = countMoved(before, sorted)
+  refileMessage.value = `Wall re-filed by ${ARRANGE_LABELS[key]} — ${moved} car${moved === 1 ? '' : 's'} moved`
+  if (refileMessageTimer) clearTimeout(refileMessageTimer)
+  refileMessageTimer = setTimeout(() => { refileMessage.value = null }, 4000)
 }
 async function arrangeCase(ci: number, key: keyof typeof ARRANGE_LABELS) {
   const next = arrangeSlice(order.value, byId.value, offsets.value[ci], caps.value[ci], ARRANGE[key])
