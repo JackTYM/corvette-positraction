@@ -7,7 +7,7 @@
       <div style="padding: 22px 22px 24px;">
         <label style="display: block; margin-bottom: 20px;">
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 4px;">What do you call it?</span>
-          <input v-model="name" placeholder="e.g. Left Wall Case" style="border-bottom: 2px solid var(--ink); padding: 5px 2px; font-family: var(--font-display); font-weight: 700; font-size: 22px;" />
+          <input v-model="name" placeholder="e.g. Hot Wheels, Matchbox, Track Cars" style="border-bottom: 2px solid var(--ink); padding: 5px 2px; font-family: var(--font-display); font-weight: 700; font-size: 22px;" />
         </label>
         <div style="display: flex; gap: 22px; align-items: flex-end;">
           <label style="flex: 1;">
