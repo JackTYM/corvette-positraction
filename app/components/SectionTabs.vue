@@ -17,10 +17,11 @@ const route = useRoute()
 const tabs = [
   { id: 'collection', label: 'Car Collection', num: '01', to: '/collection' },
   { id: 'garage', label: 'The Garage', num: '02', to: '/garage' },
-  { id: 'wishlist', label: 'Wishlist', num: '03', to: '/wishlist' },
-  { id: 'toc', label: 'Contents', num: '04', to: '/' },
-  { id: 'add', label: 'Index a Find', num: '05', to: '/add' },
-  { id: 'diecast-reference', label: 'Diecast Reference', num: '06', to: '/diecast-reference' },
+  { id: 'showroom', label: 'The Showroom', num: '03', to: '/showroom' },
+  { id: 'wishlist', label: 'Wishlist', num: '04', to: '/wishlist' },
+  { id: 'toc', label: 'Contents', num: '05', to: '/' },
+  { id: 'add', label: 'Index a Find', num: '06', to: '/add' },
+  { id: 'diecast-reference', label: 'Diecast Reference', num: '07', to: '/diecast-reference' },
 ]
 function isActive(id: string): boolean {
   if (id === 'toc') return route.path === '/'
