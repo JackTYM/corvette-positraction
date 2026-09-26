@@ -7,17 +7,24 @@
     <template v-else>
       <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">A Shared Archive</div>
       <h2 style="font-size: clamp(38px, 6.5vw, 68px); line-height: 0.9; margin-bottom: 18px;">
-        {{ activeTab === 'collection' ? 'The Collection' : 'Wishlist' }}
+        {{ activeTab === 'collection' ? 'Car Collection' : activeTab === 'catalog' ? 'The Catalog' : 'Wishlist' }}
       </h2>
 
       <div class="no-print collection-filters">
-        <button class="link-tab filter-tab" :class="{ active: activeTab === 'collection' }" @click="activeTab = 'collection'">Collection ({{ items.length }})</button>
+        <button class="link-tab filter-tab" :class="{ active: activeTab === 'collection' }" @click="activeTab = 'collection'">Car Collection ({{ carItems.length }})</button>
+        <button class="link-tab filter-tab" :class="{ active: activeTab === 'catalog' }" @click="activeTab = 'catalog'">Catalog ({{ catalogItems.length }})</button>
         <button class="link-tab filter-tab" :class="{ active: activeTab === 'wishlist' }" @click="activeTab = 'wishlist'">Wishlist ({{ wishlistItems.length }})</button>
       </div>
 
       <template v-if="activeTab === 'collection'">
         <div style="margin-top: 14px;">
-          <CategoryFilterPanel :items="items" @open="openItem" />
+          <CategoryFilterPanel :items="carItems" @open="openCarItem" />
+        </div>
+      </template>
+
+      <template v-else-if="activeTab === 'catalog'">
+        <div style="margin-top: 14px;">
+          <CategoryFilterPanel :items="catalogItems" @open="openCatalogItem" />
         </div>
       </template>
 
@@ -45,8 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Item } from '~/utils/catalog'
-import { fmtMoney } from '~/utils/catalog'
+import { fmtMoney, isCar, type Item } from '~/utils/catalog'
 
 definePageMeta({ layout: 'share' })
 
@@ -65,7 +71,11 @@ try {
   notFound.value = true
 }
 
-const activeTab = ref<'collection' | 'wishlist'>('collection')
+const carItems = computed(() => items.value.filter(isCar))
+const catalogItems = computed(() => items.value.filter((i) => !isCar(i)))
 
-function openItem(item: Item) { navigateTo(`/share/${userId}/item/${item.id}`) }
+const activeTab = ref<'collection' | 'catalog' | 'wishlist'>('collection')
+
+function openCarItem(item: Item) { navigateTo(`/share/${userId}/item/${item.id}`) }
+function openCatalogItem(item: Item) { navigateTo(`/share/${userId}/catalog/${item.id}`) }
 </script>
