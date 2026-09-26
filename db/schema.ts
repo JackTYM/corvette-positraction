@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm'
 import {
-  pgTable, uuid, text, integer, smallint, numeric, boolean, date, timestamp, jsonb, index, unique, check, pgPolicy,
+  pgTable, uuid, text, integer, smallint, numeric, boolean, date, timestamp, jsonb, index, unique, check, pgPolicy, primaryKey,
 } from 'drizzle-orm/pg-core'
 import { crudPolicy, authenticatedRole, anonymousRole, authUid } from 'drizzle-orm/neon'
 
@@ -72,12 +72,15 @@ export const items = pgTable(
 export const walls = pgTable(
   'walls',
   {
-    userId: text('user_id').primaryKey().default(sql`auth.user_id()`),
+    userId: text('user_id').notNull().default(sql`auth.user_id()`),
+    kind: text('kind').notNull().default('garage'),
     cases: jsonb('cases').notNull().default(sql`'[]'::jsonb`),
     itemOrder: jsonb('item_order').notNull().default(sql`'[]'::jsonb`),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
+    primaryKey({ columns: [table.userId, table.kind] }),
+    check('walls_kind_valid', sql`${table.kind} in ('garage', 'showroom')`),
     crudPolicy({
       role: authenticatedRole,
       read: authUid(table.userId),

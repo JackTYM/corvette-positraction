@@ -8,14 +8,13 @@
         <span>{{ item.generation === '—' ? 'EPH' : item.generation }}</span><span>·</span><span>{{ item.year || '—' }}</span>
       </div>
     </div>
-    <button class="tray-file no-print" title="Drop it into its release-year slot" @click="$emit('file')">file by<br />year →</button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { colorOf, type WallCard } from '~/utils/catalog'
 const props = defineProps<{ item: WallCard }>()
-const emit = defineEmits<{ open: [item: WallCard]; file: []; dragstart: [e: DragEvent]; dragend: [] }>()
+const emit = defineEmits<{ open: [item: WallCard]; dragstart: [e: DragEvent]; dragend: [] }>()
 
 function onDragStart(e: DragEvent) {
   try {

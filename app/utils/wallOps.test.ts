@@ -1,16 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { caseOffsets, moveInOrder, fileByComparator, arrangeSlice, caseLetter, slotCode, countMoved } from './wallOps'
-import { ARRANGE, type Item } from './catalog'
-
-function item(id: string, year: number): Item {
-  return {
-    id, title: id, sub: '', category: 'DIECAST', generation: '—', year, scale: '', maker: '',
-    acquired: '', pricePaid: 0, value: 0, valueAsOf: '', valueSource: '', productionDate: '', rarity: null,
-    condition: '', location: '', story: '', featured: false,
-    colorName: '', colorHex: '', imgKey: null, attributes: {}, sourceVariantId: null,
-    createdAt: '2020-01-01T00:00:00Z',
-  }
-}
+import { caseOffsets, moveInOrder, caseLetter, slotCode } from './wallOps'
 
 describe('caseOffsets', () => {
   it('returns cumulative starting offsets for each case', () => {
@@ -30,20 +19,6 @@ describe('moveInOrder', () => {
   })
 })
 
-describe('fileByComparator', () => {
-  it('inserts the item at the position its comparator value dictates', () => {
-    const byId = { a: item('a', 1963), b: item('b', 1990), new: item('new', 1980) }
-    expect(fileByComparator(['a', 'b'], byId, 'new', ARRANGE.release)).toEqual(['a', 'new', 'b'])
-  })
-})
-
-describe('arrangeSlice', () => {
-  it('sorts only the given slice, leaving items outside it untouched', () => {
-    const byId = { a: item('a', 1990), b: item('b', 1963), c: item('c', 2020), d: item('d', 1950) }
-    expect(arrangeSlice(['a', 'b', 'c', 'd'], byId, 0, 2, ARRANGE.release)).toEqual(['b', 'a', 'c', 'd'])
-  })
-})
-
 describe('caseLetter', () => {
   it('labels the first 26 cases A through Z', () => {
     expect(caseLetter(0)).toBe('A')
@@ -60,17 +35,5 @@ describe('slotCode', () => {
     expect(slotCode(0, 4, 6)).toBe('A-1-5')
     expect(slotCode(0, 6, 6)).toBe('A-2-1')
     expect(slotCode(1, 0, 4)).toBe('B-1-1')
-  })
-})
-
-describe('countMoved', () => {
-  it('returns 0 when the order is unchanged', () => {
-    expect(countMoved(['a', 'b', 'c'], ['a', 'b', 'c'])).toBe(0)
-  })
-  it('counts every position whose id changed', () => {
-    expect(countMoved(['a', 'b', 'c'], ['c', 'b', 'a'])).toBe(2)
-  })
-  it('treats a position past the shorter array\'s end as changed', () => {
-    expect(countMoved(['a'], ['a', 'b'])).toBe(1)
   })
 })

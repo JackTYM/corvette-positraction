@@ -56,7 +56,7 @@
 import { stats, fmtMoney, CAR_CATEGORIES, type Item } from '~/utils/catalog'
 
 const { items, fetchAll } = useItems()
-const { wall, fetchWall } = useWall()
+const { wall, fetchWall } = useWall('garage')
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 

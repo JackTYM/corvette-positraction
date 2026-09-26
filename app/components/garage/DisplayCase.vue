@@ -18,13 +18,6 @@
           </button>
           <button class="icon-btn" title="Zoom in" @click="stepZoom(0.15)">+</button>
         </div>
-        <div style="position: relative;">
-          <button class="icon-btn" @click="sortOpen = !sortOpen">tidy this case ▾</button>
-          <div v-if="sortOpen" class="sort-menu" @mouseleave="sortOpen = false">
-            <div class="kicker" style="font-size: 9px; color: var(--muted); padding: 8px 12px 4px;">Sort just this case by</div>
-            <button v-for="k in arrangeKeys" :key="k" class="sort-menu-row" @click="onArrange(k)">{{ ARRANGE_LABELS[k] }}</button>
-          </div>
-        </div>
         <button class="icon-btn" @click="$emit('edit', index)">edit</button>
         <button class="icon-btn" @click="$emit('empty', index)">empty</button>
         <button v-if="canRemove" class="icon-btn danger" @click="$emit('remove', index)">remove</button>
@@ -57,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, ARRANGE_LABELS, type WallCard } from '~/utils/catalog'
+import { fmtMoney, type WallCard } from '~/utils/catalog'
 import { caseLetter, slotCode } from '~/utils/wallOps'
 import type { WallCase } from '~/composables/useWall'
 
@@ -67,7 +60,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   dropSeq: [itemId: string, seq: number]; eject: [id: string]; open: [item: WallCard]; emptySlot: [seq: number];
-  dragstart: [id: string]; dragend: []; arrangeCase: [index: number, key: keyof typeof ARRANGE_LABELS];
+  dragstart: [id: string]; dragend: [];
   edit: [index: number]; empty: [index: number]; remove: [index: number];
 }>()
 
@@ -79,10 +72,6 @@ const filled = computed(() => Math.max(0, Math.min(props.order.length - props.of
 const parkedValue = computed(() =>
   props.order.slice(props.offset, props.offset + props.cap).reduce((s, id) => s + (props.byId[id]?.value ?? 0), 0),
 )
-
-const sortOpen = ref(false)
-const arrangeKeys = (Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]).filter((k) => k !== 'entered')
-function onArrange(k: keyof typeof ARRANGE_LABELS) { emit('arrangeCase', props.index, k); sortOpen.value = false }
 
 const zoom = ref<number | null>(null)
 const fit = ref(1)

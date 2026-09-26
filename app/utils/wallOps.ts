@@ -1,5 +1,4 @@
-// app/utils/wallOps.ts — pure reordering logic for the garage wall, ported from garage.jsx for testability
-import type { Item } from './catalog'
+// app/utils/wallOps.ts — pure reordering logic for the garage/showroom walls, ported from garage.jsx for testability
 
 export function caseOffsets(caps: number[]): number[] {
   const offsets: number[] = []
@@ -32,44 +31,4 @@ export function moveInOrder(order: string[], itemId: string, targetSeq: number):
   const next = [...without]
   next.splice(idx, 0, itemId)
   return next
-}
-
-export function fileByComparator(
-  order: string[], byId: Record<string, Item>, itemId: string, compare: (a: Item, b: Item) => number,
-): string[] {
-  // Safe: callers (garage.vue) must filter `order` against `byId` before calling —
-  // dangling ids here would indicate a caller bug, not a data condition to handle silently.
-  const item = byId[itemId]!
-  const rest = order.filter((id) => id !== itemId)
-  let idx = 0
-  for (const id of rest) {
-    // Safe: callers (garage.vue) must filter `order` against `byId` before calling —
-    // dangling ids here would indicate a caller bug, not a data condition to handle silently.
-    if (compare(byId[id]!, item) <= 0) idx++
-    else break
-  }
-  return moveInOrder(order, itemId, idx)
-}
-
-// Counts how many positions differ between two orderings of ids — used to tell the user
-// how many cars actually moved after a whole-wall re-file, not just "it ran".
-export function countMoved(oldOrder: string[], newOrder: string[]): number {
-  const len = Math.max(oldOrder.length, newOrder.length)
-  let count = 0
-  for (let i = 0; i < len; i++) {
-    if (oldOrder[i] !== newOrder[i]) count++
-  }
-  return count
-}
-
-export function arrangeSlice(
-  order: string[], byId: Record<string, Item>, start: number, cap: number, compare: (a: Item, b: Item) => number,
-): string[] {
-  const before = order.slice(0, start)
-  const mid = order.slice(start, start + cap)
-  const after = order.slice(start + cap)
-  // Safe: callers (garage.vue) must filter `order` against `byId` before calling —
-  // dangling ids here would indicate a caller bug, not a data condition to handle silently.
-  const sortedMid = [...mid].sort((a, b) => compare(byId[a]!, byId[b]!))
-  return [...before, ...sortedMid, ...after]
 }

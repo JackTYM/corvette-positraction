@@ -198,6 +198,8 @@ export const ARRANGE_LABELS: Record<keyof typeof ARRANGE, string> = {
 }
 
 export const CAR_CATEGORIES: Category[] = ['DIECAST', 'TRACK CAR', 'DISPLAY MODELS', 'SPECIALTY MATERIAL CAR']
+export const GARAGE_CATEGORIES: Category[] = ['DIECAST', 'TRACK CAR']
+export const SHOWROOM_CATEGORIES: Category[] = ['DISPLAY MODELS', 'SPECIALTY MATERIAL CAR']
 export const isCar = (item: Pick<Item,'category'> | null | undefined): boolean =>
   !!item && CAR_CATEGORIES.includes(item.category)
 

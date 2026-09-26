@@ -286,12 +286,6 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .tray-car:active { cursor: grabbing; }
 .tray-car.wishlist { border: 2px dashed var(--orange-deep); }
 .tray-car .slot-spine { width: 7px; border-right: 1.5px solid var(--ink); }
-.tray-file {
-  font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.08em; font-size: 9px;
-  border: none; border-left: 1.5px solid var(--rule); background: transparent; color: var(--orange);
-  cursor: pointer; padding: 0 9px; white-space: nowrap;
-}
-.tray-file:hover { background: var(--orange); color: var(--paper); }
 
 .modal-scrim {
   position: fixed; inset: 0; z-index: 9990;
@@ -400,9 +394,6 @@ input:focus, textarea:focus, select:focus { outline: none; }
 @media (max-width: 860px) { .index-card-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .index-card-grid { grid-template-columns: 1fr; } }
 
-.sort-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 20; background: var(--paper); border: 2px solid var(--ink); box-shadow: var(--shadow); min-width: 168px; }
-.sort-menu-row { padding: 8px 12px; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.06em; font-size: 12px; display: block; width: 100%; text-align: left; border: none; background: transparent; cursor: pointer; }
-.sort-menu-row:hover { background: var(--paper-2); }
 .tray-car-spine { width: 6px; flex: 0 0 auto; border-right: 1.5px solid var(--ink); }
 .pick-swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink); flex: 0 0 auto; display: inline-block; }
 
