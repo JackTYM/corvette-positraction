@@ -201,6 +201,14 @@ export const CAR_CATEGORIES: Category[] = ['DIECAST', 'TRACK CAR', 'DISPLAY MODE
 export const isCar = (item: Pick<Item,'category'> | null | undefined): boolean =>
   !!item && CAR_CATEGORIES.includes(item.category)
 
+// A linked entry can point to either a car or a catalog item, and the two live under
+// different route trees (private: /collection vs /catalog; public share: .../item vs
+// .../catalog). Centralizing this pick avoids the isCar(...) ? carBase : catalogBase
+// ternary drifting out of sync across its several call sites (item detail pages, both
+// private and shared).
+export const itemHref = (item: Pick<Item, 'id' | 'category'>, carBase: string, catalogBase: string): string =>
+  `${isCar(item) ? carBase : catalogBase}/${item.id}`
+
 export type Collection = 'Diecast' | 'Track Car' | 'Display Models' | 'Specialty Material Car' | 'Other' | 'Auto Parts' | 'Hubcaps'
 export const COLLECTION_NAMES: Collection[] = ['Diecast', 'Track Car', 'Display Models', 'Specialty Material Car', 'Other', 'Auto Parts', 'Hubcaps']
 

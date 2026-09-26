@@ -63,7 +63,7 @@
         <div v-if="linkedItems.length" style="margin-top: 24px;">
           <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Linked Entries</div>
           <div v-for="li in linkedItems" :key="li.linkId" style="padding: 8px 0; border-bottom: 1px solid var(--rule);">
-            <NuxtLink :to="isCar(li.item) ? `/share/${userId}/item/${li.item.id}` : `/share/${userId}/catalog/${li.item.id}`" style="font-size: 15px;">{{ li.item.title }}</NuxtLink>
+            <NuxtLink :to="itemHref(li.item, `/share/${userId}/item`, `/share/${userId}/catalog`)" style="font-size: 15px;">{{ li.item.title }}</NuxtLink>
           </div>
         </div>
 
@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, isCar, type Generation, type Item } from '~/utils/catalog'
+import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, itemHref, type Generation, type Item } from '~/utils/catalog'
 import type { ItemLink } from '~/composables/useItemLinks'
 import type { ItemDocument } from '~/composables/useItemDocuments'
 

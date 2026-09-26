@@ -74,7 +74,7 @@
         <div class="no-print" style="margin-top: 24px;">
           <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">Linked Entries</div>
           <div v-for="li in linkedItems" :key="li.linkId" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--rule);">
-            <NuxtLink :to="isCar(li.item) ? `/collection/${li.item.id}` : `/catalog/${li.item.id}`" style="font-size: 15px;">{{ li.item.title }}</NuxtLink>
+            <NuxtLink :to="itemHref(li.item, '/collection', '/catalog')" style="font-size: 15px;">{{ li.item.title }}</NuxtLink>
             <button class="link-tab" style="color: var(--muted); font-size: 11px; background: none; border: none;" @click="onUnlink(li.linkId)">unlink</button>
           </div>
           <button class="btn ghost" style="margin-top: 10px; font-size: 12px; padding: 7px 13px;" @click="showLinkPicker = true">+ Link an Entry</button>
@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, isCar, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Generation, type Item } from '~/utils/catalog'
+import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, itemHref, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Generation, type Item } from '~/utils/catalog'
 import { otherItemId, type ItemLink } from '~/composables/useItemLinks'
 import type { ItemDocument } from '~/composables/useItemDocuments'
 
