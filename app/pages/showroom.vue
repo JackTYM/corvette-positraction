@@ -12,7 +12,7 @@
     <div class="no-print garage-toolbar">
       <div style="flex: 1;" />
       <button class="btn ghost" style="padding: 7px 13px; font-size: 12px;" @click="formState = { add: true }">+ Add Case</button>
-      <button v-if="order.length > 0" class="link-tab" style="font-size: 12px; padding: 6px 11px; border: 1.5px solid var(--rule); color: var(--muted);" @click="confirmEmptyWall">clear wall</button>
+      <button v-if="order.length > 0" class="link-tab" style="font-size: 12px; padding: 6px 11px; border: 1.5px solid var(--rule); color: var(--muted);" @click="confirmEmptyWall">clear showroom</button>
     </div>
 
     <div v-if="overflow.length > 0" class="wall-warn no-print">
