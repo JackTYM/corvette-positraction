@@ -12,14 +12,14 @@ export const GENERATIONS: Record<Exclude<Generation,'—'>, { years: string; nam
 }
 
 export type Category =
-  | 'DIECAST' | 'BROCHURE' | 'ADVERTISEMENT' | 'BADGE' | 'PATCH' | 'PHOTO' | 'BOOK' | 'ART'
-  | 'SPECIALTY CAR' | 'OTHER COLLECTABLES' | 'INSTRUCTIONAL CD' | 'MUSIC CD' | 'LITHOGRAPHIC TIN'
+  | 'DIECAST' | 'TRACK CAR' | 'DISPLAY MODELS' | 'BROCHURE' | 'ADVERTISEMENT' | 'BADGE' | 'PATCH' | 'PHOTO' | 'BOOK' | 'ART'
+  | 'SPECIALTY MATERIAL CAR' | 'OTHER COLLECTABLES' | 'INSTRUCTIONAL CD' | 'MUSIC CD' | 'LITHOGRAPHIC TIN'
   | 'MAGAZINE' | 'AUTO PART' | 'OWNERS MANUAL' | 'HUBCAP'
 
 export const CATEGORIES: Record<Category, 'orange'|'ink'> = {
-  'DIECAST': 'orange', 'BROCHURE': 'ink', 'ADVERTISEMENT': 'orange', 'BADGE': 'ink',
+  'DIECAST': 'orange', 'TRACK CAR': 'orange', 'DISPLAY MODELS': 'orange', 'BROCHURE': 'ink', 'ADVERTISEMENT': 'orange', 'BADGE': 'ink',
   'PATCH': 'orange', 'PHOTO': 'ink', 'BOOK': 'orange', 'ART': 'ink',
-  'SPECIALTY CAR': 'orange', 'OTHER COLLECTABLES': 'ink', 'INSTRUCTIONAL CD': 'orange',
+  'SPECIALTY MATERIAL CAR': 'orange', 'OTHER COLLECTABLES': 'ink', 'INSTRUCTIONAL CD': 'orange',
   'MUSIC CD': 'ink', 'LITHOGRAPHIC TIN': 'orange', 'MAGAZINE': 'ink', 'AUTO PART': 'orange',
   'OWNERS MANUAL': 'ink', 'HUBCAP': 'orange',
 }
@@ -197,16 +197,18 @@ export const ARRANGE_LABELS: Record<keyof typeof ARRANGE, string> = {
   entered: 'order entered', release: 'release year', date: 'date acquired', generation: 'generation', color: 'color', category: 'type', value: 'value',
 }
 
-export const CAR_CATEGORIES: Category[] = ['DIECAST', 'SPECIALTY CAR']
+export const CAR_CATEGORIES: Category[] = ['DIECAST', 'TRACK CAR', 'DISPLAY MODELS', 'SPECIALTY MATERIAL CAR']
 export const isCar = (item: Pick<Item,'category'> | null | undefined): boolean =>
   !!item && CAR_CATEGORIES.includes(item.category)
 
-export type Collection = 'Diecast' | 'Specialty Cars' | 'Other' | 'Auto Parts' | 'Hubcaps'
-export const COLLECTION_NAMES: Collection[] = ['Diecast', 'Specialty Cars', 'Other', 'Auto Parts', 'Hubcaps']
+export type Collection = 'Diecast' | 'Track Car' | 'Display Models' | 'Specialty Material Car' | 'Other' | 'Auto Parts' | 'Hubcaps'
+export const COLLECTION_NAMES: Collection[] = ['Diecast', 'Track Car', 'Display Models', 'Specialty Material Car', 'Other', 'Auto Parts', 'Hubcaps']
 
 export const COLLECTIONS: Record<Collection, Category[]> = {
   'Diecast': ['DIECAST'],
-  'Specialty Cars': ['SPECIALTY CAR'],
+  'Track Car': ['TRACK CAR'],
+  'Display Models': ['DISPLAY MODELS'],
+  'Specialty Material Car': ['SPECIALTY MATERIAL CAR'],
   'Other': [
     'BROCHURE', 'ADVERTISEMENT', 'BADGE', 'PATCH', 'PHOTO', 'BOOK', 'ART',
     'OTHER COLLECTABLES', 'INSTRUCTIONAL CD', 'MUSIC CD', 'LITHOGRAPHIC TIN', 'MAGAZINE', 'OWNERS MANUAL',
@@ -234,14 +236,66 @@ export interface FieldDef {
 }
 
 export const CATEGORY_HAS_GENERATION: Record<Category, boolean> = {
-  'DIECAST': true, 'BROCHURE': true, 'ADVERTISEMENT': true, 'BADGE': true, 'PATCH': true,
-  'PHOTO': true, 'BOOK': true, 'ART': false, 'SPECIALTY CAR': true, 'OTHER COLLECTABLES': false,
+  'DIECAST': true, 'TRACK CAR': true, 'DISPLAY MODELS': true, 'BROCHURE': true, 'ADVERTISEMENT': true, 'BADGE': true, 'PATCH': true,
+  'PHOTO': true, 'BOOK': true, 'ART': false, 'SPECIALTY MATERIAL CAR': true, 'OTHER COLLECTABLES': false,
   'INSTRUCTIONAL CD': true, 'MUSIC CD': true, 'LITHOGRAPHIC TIN': true, 'MAGAZINE': false,
   'AUTO PART': true, 'OWNERS MANUAL': false, 'HUBCAP': true,
 }
 
 export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
   'DIECAST': [
+    { key: 'castingYear', label: 'Casting Year', type: 'number', placeholder: '1975' },
+    { key: 'modelSeries', label: 'Model Series', type: 'text' },
+    { key: 'subSeries', label: 'Sub Series', type: 'text' },
+    { key: 'toyNumber', label: 'Toy #', type: 'text' },
+    { key: 'manufacturerCollectorNumber', label: 'Manufacturer Collector Number', type: 'text' },
+    { key: 'primaryColor', label: 'Primary Color', type: 'text' },
+    { key: 'tampoColor', label: 'Tampo Color', type: 'text' },
+    { key: 'interiorColor', label: 'Interior Color', type: 'text' },
+    { key: 'baseColorMat', label: 'Base Color / Mat', type: 'text' },
+    { key: 'wheelType', label: 'Wheel Type', type: 'select', options: ['Redline', 'Real Riders', 'Basic Wheels', '5-Spoke', '5-Dot', 'Chrome', 'Other / Custom'] },
+    { key: 'wheelTypeOther', label: 'Wheel Type (if Other / Custom)', type: 'text', showWhen: { key: 'wheelType', equals: 'Other / Custom' } },
+    { key: 'looseOrCard', label: 'Loose / On-Card', type: 'select', options: ['Loose', 'On-Card'] },
+    { key: 'bodyStyle', label: 'Coupe / Convertible / Roadster', type: 'select', options: ['Coupe', 'Convertible', 'Roadster'] },
+    { key: 'driveType', label: 'Drive / Mechanism Type', type: 'select', options: ['Free-Roll', 'Pull Back', 'Pull Forward', 'Radio Controlled', 'IP Chip'] },
+    { key: 'redline', label: 'Redline', type: 'checkbox' },
+    { key: 'treasureHunt', label: 'Treasure Hunt', type: 'checkbox' },
+    { key: 'softTire', label: 'Soft Tire', type: 'checkbox' },
+    { key: 'starsAndStripes', label: 'Stars and Stripes Style', type: 'checkbox' },
+    { key: 'goldPlated', label: 'Gold Plated', type: 'checkbox' },
+    { key: 'silverPlated', label: 'Silver Plated', type: 'checkbox' },
+    { key: 'iridescentMetallic', label: 'Iridescent / Metallic', type: 'checkbox' },
+    { key: 'corvetteProStreet', label: 'Corvette Pro Street', type: 'checkbox' },
+    { key: 'errorCar', label: 'Error Car', type: 'checkbox' },
+    { key: 'blackMarketUnSpun', label: 'Black Market / Un-Spun', type: 'checkbox' },
+  ],
+  'TRACK CAR': [
+    { key: 'castingYear', label: 'Casting Year', type: 'number', placeholder: '1975' },
+    { key: 'modelSeries', label: 'Model Series', type: 'text' },
+    { key: 'subSeries', label: 'Sub Series', type: 'text' },
+    { key: 'toyNumber', label: 'Toy #', type: 'text' },
+    { key: 'manufacturerCollectorNumber', label: 'Manufacturer Collector Number', type: 'text' },
+    { key: 'primaryColor', label: 'Primary Color', type: 'text' },
+    { key: 'tampoColor', label: 'Tampo Color', type: 'text' },
+    { key: 'interiorColor', label: 'Interior Color', type: 'text' },
+    { key: 'baseColorMat', label: 'Base Color / Mat', type: 'text' },
+    { key: 'wheelType', label: 'Wheel Type', type: 'select', options: ['Redline', 'Real Riders', 'Basic Wheels', '5-Spoke', '5-Dot', 'Chrome', 'Other / Custom'] },
+    { key: 'wheelTypeOther', label: 'Wheel Type (if Other / Custom)', type: 'text', showWhen: { key: 'wheelType', equals: 'Other / Custom' } },
+    { key: 'looseOrCard', label: 'Loose / On-Card', type: 'select', options: ['Loose', 'On-Card'] },
+    { key: 'bodyStyle', label: 'Coupe / Convertible / Roadster', type: 'select', options: ['Coupe', 'Convertible', 'Roadster'] },
+    { key: 'driveType', label: 'Drive / Mechanism Type', type: 'select', options: ['Free-Roll', 'Pull Back', 'Pull Forward', 'Radio Controlled', 'IP Chip'] },
+    { key: 'redline', label: 'Redline', type: 'checkbox' },
+    { key: 'treasureHunt', label: 'Treasure Hunt', type: 'checkbox' },
+    { key: 'softTire', label: 'Soft Tire', type: 'checkbox' },
+    { key: 'starsAndStripes', label: 'Stars and Stripes Style', type: 'checkbox' },
+    { key: 'goldPlated', label: 'Gold Plated', type: 'checkbox' },
+    { key: 'silverPlated', label: 'Silver Plated', type: 'checkbox' },
+    { key: 'iridescentMetallic', label: 'Iridescent / Metallic', type: 'checkbox' },
+    { key: 'corvetteProStreet', label: 'Corvette Pro Street', type: 'checkbox' },
+    { key: 'errorCar', label: 'Error Car', type: 'checkbox' },
+    { key: 'blackMarketUnSpun', label: 'Black Market / Un-Spun', type: 'checkbox' },
+  ],
+  'DISPLAY MODELS': [
     { key: 'castingYear', label: 'Casting Year', type: 'number', placeholder: '1975' },
     { key: 'modelSeries', label: 'Model Series', type: 'text' },
     { key: 'subSeries', label: 'Sub Series', type: 'text' },
@@ -292,7 +346,7 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
   'ART': [
     { key: 'presentation', label: 'Canvas / Frame / Unframed', type: 'select', options: ['Canvas', 'Framed', 'Unframed'] },
   ],
-  'SPECIALTY CAR': [
+  'SPECIALTY MATERIAL CAR': [
     { key: 'material', label: 'Material (Pewter, Glass, etc.)', type: 'text' },
     { key: 'productionYear', label: 'Production Year', type: 'number' },
     { key: 'modelSeries', label: 'Model Series', type: 'text' },

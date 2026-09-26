@@ -77,9 +77,11 @@ describe('ARRANGE.value', () => {
 })
 
 describe('isCar', () => {
-  it('is true for DIECAST and SPECIALTY CAR', () => {
+  it('is true for all four car categories', () => {
     expect(isCar(item({ category: 'DIECAST' }))).toBe(true)
-    expect(isCar(item({ category: 'SPECIALTY CAR' }))).toBe(true)
+    expect(isCar(item({ category: 'TRACK CAR' }))).toBe(true)
+    expect(isCar(item({ category: 'DISPLAY MODELS' }))).toBe(true)
+    expect(isCar(item({ category: 'SPECIALTY MATERIAL CAR' }))).toBe(true)
   })
   it('is false for paper ephemera', () => {
     expect(isCar(item({ category: 'BROCHURE' }))).toBe(false)
@@ -101,11 +103,11 @@ describe('COLLECTIONS / collectionOf', () => {
   it('maps HUBCAP to the Hubcaps collection', () => {
     expect(collectionOf('HUBCAP')).toBe('Hubcaps')
   })
-  it('maps SPECIALTY CAR to its own collection, not Diecast', () => {
-    expect(collectionOf('SPECIALTY CAR')).toBe('Specialty Cars')
-  })
-  it('maps DIECAST to Diecast', () => {
+  it('maps each of the four car categories to its own collection', () => {
     expect(collectionOf('DIECAST')).toBe('Diecast')
+    expect(collectionOf('TRACK CAR')).toBe('Track Car')
+    expect(collectionOf('DISPLAY MODELS')).toBe('Display Models')
+    expect(collectionOf('SPECIALTY MATERIAL CAR')).toBe('Specialty Material Car')
   })
   it('maps AUTO PART to Auto Parts', () => {
     expect(collectionOf('AUTO PART')).toBe('Auto Parts')
