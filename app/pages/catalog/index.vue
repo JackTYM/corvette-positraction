@@ -1,0 +1,37 @@
+<template>
+  <div class="wrap" style="padding: 20px 26px 70px;">
+    <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">The Catalog</div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+      <h2 style="font-size: clamp(30px, 4.5vw, 44px); line-height: 0.95;">The Catalog</h2>
+      <NuxtLink to="/catalog/add" class="btn primary no-print">+ Add to Catalog</NuxtLink>
+    </div>
+
+    <div class="no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px;">
+      <span class="kicker" style="color: var(--muted); font-size: 10px; margin-right: 2px;">Sort by</span>
+      <button
+        v-for="k in sortKeys" :key="k" class="link-tab whole-wall-tab" :class="{ suggested: k === 'entered', active: k === activeSort }"
+        @click="activeSort = k"
+      >{{ ARRANGE_LABELS[k] }}</button>
+    </div>
+
+    <CategoryFilterPanel :items="sortedItems" @open="openItem" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ARRANGE, ARRANGE_LABELS, isCar, type Item } from '~/utils/catalog'
+
+const { items, fetchAll } = useItems()
+try {
+  await fetchAll()
+} catch (err) {
+  console.warn('Failed to load items for the Catalog page:', err)
+}
+
+const catalogItems = computed(() => items.value.filter((i) => !isCar(i)))
+const sortKeys = Object.keys(ARRANGE_LABELS) as (keyof typeof ARRANGE_LABELS)[]
+const activeSort = ref<keyof typeof ARRANGE_LABELS>('entered')
+const sortedItems = computed(() => [...catalogItems.value].sort(ARRANGE[activeSort.value]))
+
+function openItem(item: Item) { navigateTo(`/catalog/${item.id}`) }
+</script>
