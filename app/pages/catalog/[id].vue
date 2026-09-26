@@ -1,7 +1,7 @@
 <template>
   <div v-if="item" class="wrap" style="padding: 26px 26px 70px;">
-    <button class="link-tab no-print" style="color: var(--orange); margin-bottom: 20px; background: none; border: none;" @click="$router.back()">← Back to the Collection</button>
-    <NuxtLink :to="`/add?edit=${item.id}`" class="link-tab no-print" style="color: var(--muted); margin-bottom: 20px; margin-left: 16px; display: inline-block;">Edit</NuxtLink>
+    <button class="link-tab no-print" style="color: var(--orange); margin-bottom: 20px; background: none; border: none;" @click="$router.back()">← Back to the Catalog</button>
+    <NuxtLink :to="`/catalog/add?edit=${item.id}`" class="link-tab no-print" style="color: var(--muted); margin-bottom: 20px; margin-left: 16px; display: inline-block;">Edit</NuxtLink>
     <button class="link-tab no-print" style="color: var(--muted); margin-bottom: 20px; margin-left: 16px; background: none; border: none;" @click="onDelete">Remove from Archive</button>
 
     <div class="detail-grid">
@@ -13,22 +13,13 @@
           <div style="position: absolute; top: 18px; left: 18px;"><Stamp :category="item.category" /></div>
         </div>
         <div class="detail-condition">
-          <div class="kicker" style="color: var(--orange); margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
-            Condition
-            <InfoTooltip v-if="item.category === 'DIECAST'">
-              <div style="font-weight: 700; margin-bottom: 8px;">Grade Scale</div>
-              <p v-for="g in DIECAST_GRADE_SCALE" :key="g.value" style="margin: 0 0 8px;">
-                <strong>{{ gradeLabel(g) }}:</strong> {{ g.description }}
-              </p>
-              <p style="margin: 10px 0 0; font-style: italic; color: var(--muted); font-size: 11.5px;">*{{ DIECAST_GRADE_SCALE_ATTRIBUTION }}</p>
-            </InfoTooltip>
-          </div>
+          <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">Condition</div>
           <p style="margin: 0; font-size: 16px; line-height: 1.5; font-style: italic;">{{ item.condition }}</p>
         </div>
       </div>
 
       <div>
-        <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">{{ CAR_CATEGORIES.includes(item.category) ? `${item.year} · ${item.maker}` : item.year }}</div>
+        <div class="kicker" style="color: var(--orange); margin-bottom: 8px;">{{ item.year }}</div>
         <h2 style="font-size: clamp(34px, 5vw, 52px); line-height: 0.92;">{{ item.title }}</h2>
         <p style="font-style: italic; color: var(--muted); font-size: 18px; margin: 10px 0 0;">{{ item.sub }}</p>
 
@@ -98,12 +89,12 @@
   </div>
   <div v-else class="wrap" style="padding: 60px 26px;">
     <p style="font-style: italic; color: var(--muted);">That item isn't in your archive.</p>
-    <NuxtLink to="/collection" class="btn" style="margin-top: 16px;">← Back to the Collection</NuxtLink>
+    <NuxtLink to="/catalog" class="btn" style="margin-top: 16px;">← Back to the Catalog</NuxtLink>
   </div>
 </template>
 
 <script setup lang="ts">
-import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, CAR_CATEGORIES, isCar, DIECAST_GRADE_SCALE, DIECAST_GRADE_SCALE_ATTRIBUTION, gradeLabel, type Generation, type Item } from '~/utils/catalog'
+import { fmtMoney, fmtDate, GENERATIONS, CATEGORY_FIELDS, CATEGORY_HAS_GENERATION, isCar, type Generation, type Item } from '~/utils/catalog'
 import { otherItemId, type ItemLink } from '~/composables/useItemLinks'
 import type { ItemDocument } from '~/composables/useItemDocuments'
 
@@ -118,7 +109,7 @@ if (!items.value.length) {
   try {
     await fetchAll()
   } catch (err) {
-    console.warn('Failed to load items for the Item Detail page:', err)
+    console.warn('Failed to load items for the Catalog Item Detail page:', err)
   }
 }
 
@@ -225,7 +216,7 @@ async function onDelete() {
   for (const key of docKeys) {
     try { await removeDocumentFile(key) } catch (err) { console.warn('Failed to remove R2 document after item delete:', err) }
   }
-  await navigateTo('/collection')
+  await navigateTo('/catalog')
 }
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
@@ -248,10 +239,6 @@ const attrRows = computed<[string, string][]>(() => {
   if (CATEGORY_HAS_GENERATION[item.value.category]) {
     const g = item.value.generation !== '—' ? GENERATIONS[item.value.generation as Exclude<Generation, '—'>] : undefined
     out.push(['Generation', item.value.generation === '—' ? 'Ephemera' : `${item.value.generation} — ${g ? g.name : ''}`])
-  }
-  if (CAR_CATEGORIES.includes(item.value.category)) {
-    out.push(['Scale / Format', item.value.scale])
-    out.push(['Maker', item.value.maker])
   }
   for (const f of CATEGORY_FIELDS[item.value.category]) {
     if (f.showWhen && item.value.attributes[f.showWhen.key] !== f.showWhen.equals) continue
