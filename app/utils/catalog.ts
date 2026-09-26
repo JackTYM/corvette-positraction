@@ -106,10 +106,10 @@ export function deriveGeneration(name: string): { generation: Generation; year: 
   return { generation: '—', year }
 }
 
-export function wishlistItemAsCard(w: { id: string; title: string; estimatedPrice: number; imgKey: string | null; sourceVariantId: string | null; createdAt: string }): Item {
+export function wishlistItemAsCard(w: { id: string; title: string; estimatedPrice: number; imgKey: string | null; sourceVariantId: string | null; createdAt: string; category: Category }): Item {
   const { generation, year } = deriveGeneration(w.title)
   return {
-    id: w.id, title: w.title, sub: '', category: 'DIECAST', generation, year: year ?? '',
+    id: w.id, title: w.title, sub: '', category: w.category, generation, year: year ?? '',
     scale: '', maker: '', acquired: w.createdAt.slice(0, 10), pricePaid: 0, value: w.estimatedPrice,
     valueAsOf: '', valueSource: '', productionDate: '', rarity: null, condition: '', location: '',
     story: '', featured: false, colorName: '', colorHex: '', imgKey: w.imgKey, attributes: {},

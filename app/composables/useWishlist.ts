@@ -1,7 +1,10 @@
+import type { Category } from '~/utils/catalog'
+
 export interface WishlistItemRow {
   id: string
   user_id: string
   title: string
+  category: string | null
   estimated_price: string | number | null
   source_url: string | null
   notes: string | null
@@ -14,6 +17,7 @@ export interface WishlistItemRow {
 export interface WishlistItem {
   id: string
   title: string
+  category: Category
   estimatedPrice: number
   sourceUrl: string
   notes: string
@@ -26,6 +30,7 @@ export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
   return {
     id: row.id,
     title: row.title,
+    category: (row.category ?? 'DIECAST') as Category,
     estimatedPrice: Number(row.estimated_price) || 0,
     sourceUrl: row.source_url ?? '',
     notes: row.notes ?? '',
@@ -38,6 +43,7 @@ export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
 export function wishlistToPatch(input: Partial<WishlistItem>): Record<string, unknown> {
   const patch: Record<string, unknown> = {}
   if (input.title !== undefined) patch.title = input.title
+  if (input.category !== undefined) patch.category = input.category
   if (input.estimatedPrice !== undefined) patch.estimated_price = input.estimatedPrice
   if (input.sourceUrl !== undefined) patch.source_url = input.sourceUrl
   if (input.notes !== undefined) patch.notes = input.notes

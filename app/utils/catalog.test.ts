@@ -294,7 +294,7 @@ describe('wishlistItemAsCard', () => {
   it('synthesizes a full Item from a thin wishlist row, deriving generation/year from the title', () => {
     const card = wishlistItemAsCard({
       id: 'wish-1', title: 'C7 R', estimatedPrice: 150, imgKey: 'user-1/abc.jpg',
-      sourceVariantId: 'variant-1', createdAt: '2020-05-15T00:00:00Z',
+      sourceVariantId: 'variant-1', createdAt: '2020-05-15T00:00:00Z', category: 'DIECAST',
     })
     expect(card.id).toBe('wish-1')
     expect(card.title).toBe('C7 R')
@@ -308,7 +308,7 @@ describe('wishlistItemAsCard', () => {
   it('falls back to unknown generation and blank year when the title has neither a code nor a year', () => {
     const card = wishlistItemAsCard({
       id: 'wish-2', title: 'Custom Corvette', estimatedPrice: 0, imgKey: null,
-      sourceVariantId: null, createdAt: '2021-01-01T00:00:00Z',
+      sourceVariantId: null, createdAt: '2021-01-01T00:00:00Z', category: 'DIECAST',
     })
     expect(card.generation).toBe('—')
     expect(card.year).toBe('')
@@ -317,9 +317,16 @@ describe('wishlistItemAsCard', () => {
   it('composes into a WallCard by adding the owned flag', () => {
     const card: WallCard = { ...wishlistItemAsCard({
       id: 'wish-3', title: 'C6 Convertible', estimatedPrice: 50, imgKey: null,
-      sourceVariantId: null, createdAt: '2022-03-01T00:00:00Z',
+      sourceVariantId: null, createdAt: '2022-03-01T00:00:00Z', category: 'DIECAST',
     }), owned: false }
     expect(card.owned).toBe(false)
     expect(card.generation).toBe('C6')
+  })
+  it('carries a non-Diecast category through instead of hard-coding DIECAST', () => {
+    const card = wishlistItemAsCard({
+      id: 'wish-4', title: 'Slot Car', estimatedPrice: 30, imgKey: null,
+      sourceVariantId: null, createdAt: '2023-01-01T00:00:00Z', category: 'TRACK CAR',
+    })
+    expect(card.category).toBe('TRACK CAR')
   })
 })

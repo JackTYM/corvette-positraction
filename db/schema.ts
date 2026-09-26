@@ -186,6 +186,7 @@ export const wishlistItems = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id').notNull().default(sql`auth.user_id()`),
     title: text('title').notNull(),
+    category: text('category'),
     estimatedPrice: numeric('estimated_price', { precision: 12, scale: 2 }),
     sourceUrl: text('source_url'),
     notes: text('notes'),

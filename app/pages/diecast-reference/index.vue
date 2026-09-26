@@ -226,6 +226,7 @@ async function addToWishlist(variant: DiecastVariant, model: DiecastModel) {
     const imported = await importFromUrl(variant.imageUrl)
     await createWishlistItem({
       title: model.name,
+      category: 'DIECAST',
       estimatedPrice: 0,
       sourceUrl: model.sourceUrl,
       notes: variant.caption ?? '',
