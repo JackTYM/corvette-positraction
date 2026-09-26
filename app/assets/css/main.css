@@ -340,6 +340,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .mag-tab.active { background: var(--orange); color: var(--paper); }
 .mag-tab-sec { font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.22em; opacity: 0.72; font-weight: 600; }
 .mag-tab-label { font-family: var(--font-display); font-weight: 800; font-size: clamp(15px, 2vw, 21px); line-height: 0.92; letter-spacing: -0.01em; white-space: nowrap; }
+.mag-tab-catalog { flex: 0 0 auto; margin-left: auto; border-left: 3px solid var(--ink); }
 
 .editorial-card {
   background: var(--paper); border: 2px solid var(--ink); box-shadow: var(--shadow);

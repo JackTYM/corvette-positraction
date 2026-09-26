@@ -5,6 +5,9 @@
         <span class="mag-tab-sec">SEC. {{ t.num }}</span>
         <span class="mag-tab-label">{{ t.label }}</span>
       </NuxtLink>
+      <NuxtLink to="/catalog" class="mag-tab mag-tab-catalog" :class="{ active: isActive('catalog') }">
+        <span class="mag-tab-label">The Catalog</span>
+      </NuxtLink>
     </div>
   </nav>
 </template>
@@ -12,7 +15,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const tabs = [
-  { id: 'collection', label: 'The Collection', num: '01', to: '/collection' },
+  { id: 'collection', label: 'Car Collection', num: '01', to: '/collection' },
   { id: 'garage', label: 'The Garage', num: '02', to: '/garage' },
   { id: 'wishlist', label: 'Wishlist', num: '03', to: '/wishlist' },
   { id: 'toc', label: 'Contents', num: '04', to: '/' },
@@ -24,6 +27,7 @@ function isActive(id: string): boolean {
   if (id === 'collection') return route.path.startsWith('/collection')
   if (id === 'diecast-reference') return route.path.startsWith('/diecast-reference')
   if (id === 'wishlist') return route.path.startsWith('/wishlist')
+  if (id === 'catalog') return route.path.startsWith('/catalog')
   return route.path === `/${id}`
 }
 </script>
