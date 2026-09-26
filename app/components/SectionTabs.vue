@@ -24,10 +24,6 @@ const tabs = [
 ]
 function isActive(id: string): boolean {
   if (id === 'toc') return route.path === '/'
-  if (id === 'collection') return route.path.startsWith('/collection')
-  if (id === 'diecast-reference') return route.path.startsWith('/diecast-reference')
-  if (id === 'wishlist') return route.path.startsWith('/wishlist')
-  if (id === 'catalog') return route.path.startsWith('/catalog')
-  return route.path === `/${id}`
+  return route.path.startsWith(`/${id}`)
 }
 </script>
