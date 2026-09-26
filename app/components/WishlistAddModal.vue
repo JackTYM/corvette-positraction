@@ -21,6 +21,12 @@
           <input v-model="title" placeholder="e.g. 1967 L88 Coupe" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16px; width: 100%;" />
         </label>
         <label style="display: block;">
+          <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Collection</span>
+          <select v-model="collection" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16px; width: 100%; font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.08em;">
+            <option v-for="c in COLLECTION_NAMES" :key="c" :value="c">{{ c }}</option>
+          </select>
+        </label>
+        <label style="display: block;">
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Estimated Price ($)</span>
           <input v-model="estimatedPrice" type="number" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16px; width: 100%;" />
         </label>
@@ -43,6 +49,8 @@
 </template>
 
 <script setup lang="ts">
+import { COLLECTIONS, COLLECTION_NAMES, type Collection } from '~/utils/catalog'
+
 const emit = defineEmits<{ close: []; saved: [] }>()
 const { upload } = useImageUpload()
 const { create } = useWishlist()
@@ -50,6 +58,7 @@ const { create } = useWishlist()
 const pendingFile = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
 const title = ref('')
+const collection = ref<Collection>('Diecast')
 const estimatedPrice = ref('')
 const sourceUrl = ref('')
 const notes = ref('')
@@ -102,7 +111,7 @@ async function onSave() {
       imgKey = result.key
     }
     await create({
-      title: title.value, estimatedPrice: Number(estimatedPrice.value) || 0,
+      title: title.value, category: COLLECTIONS[collection.value][0]!, estimatedPrice: Number(estimatedPrice.value) || 0,
       sourceUrl: sourceUrl.value, notes: notes.value, imgKey, sourceVariantId: null,
     })
     emit('saved')
