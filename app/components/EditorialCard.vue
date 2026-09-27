@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { colorOf, CAR_CATEGORIES, type Item } from '~/utils/catalog'
 const props = defineProps<{ item: Item & { owned?: boolean } }>()
-defineEmits<{ open: [item: Item] }>()
+defineEmits<{ open: [item: Item & { owned?: boolean }] }>()
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 const isWishlist = computed(() => props.item.owned === false)
