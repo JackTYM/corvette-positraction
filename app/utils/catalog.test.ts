@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, CATEGORY_FIELDS, extractYearFromName, type Item,
+  fmtMoney, fmtDate, stats, colorKey, ARRANGE, isCar, isRareCarItem, CATEGORY_FIELDS, extractYearFromName, type Item,
   freshAttributeFilters, matchesAttributeField, matchesAttributeFilters, emptyTopLevelFilters, matchesTopLevelFilters,
   deriveGeneration, compareByGeneration, type Generation,
   type FieldDef,
@@ -328,5 +328,23 @@ describe('wishlistItemAsCard', () => {
       sourceVariantId: null, createdAt: '2023-01-01T00:00:00Z', category: 'TRACK CAR',
     })
     expect(card.category).toBe('TRACK CAR')
+  })
+})
+
+describe('isRareCarItem', () => {
+  it('is false when no checkbox attribute is set', () => {
+    expect(isRareCarItem(item({ category: 'DIECAST', attributes: {} }))).toBe(false)
+  })
+  it('is true when any one checkbox attribute is set', () => {
+    expect(isRareCarItem(item({ category: 'DIECAST', attributes: { treasureHunt: true } }))).toBe(true)
+  })
+  it('is true for a different checkbox on the same category', () => {
+    expect(isRareCarItem(item({ category: 'DIECAST', attributes: { errorCar: true } }))).toBe(true)
+  })
+  it('ignores a checkbox explicitly set to false', () => {
+    expect(isRareCarItem(item({ category: 'DIECAST', attributes: { treasureHunt: false } }))).toBe(false)
+  })
+  it('is false for a category with no checkbox fields at all', () => {
+    expect(isRareCarItem(item({ category: 'SPECIALTY MATERIAL CAR', attributes: {} }))).toBe(false)
   })
 })

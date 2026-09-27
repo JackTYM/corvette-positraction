@@ -396,6 +396,12 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
   'HUBCAP': [],
 }
 
+export function isRareCarItem(item: Item): boolean {
+  return CATEGORY_FIELDS[item.category]
+    .filter((f) => f.type === 'checkbox')
+    .some((f) => item.attributes[f.key] === true)
+}
+
 // --- Collection page filtering -------------------------------------------------
 // Per-category attribute filters (one control per CATEGORY_FIELDS[category] entry)
 // plus a handful of common top-level filters. All pure so they're unit-testable
