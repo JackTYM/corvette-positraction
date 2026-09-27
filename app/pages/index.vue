@@ -47,29 +47,54 @@
           <NuxtLink to="/collection" class="btn primary" style="flex: 1 1 180px; justify-content: center;">Browse the Collection →</NuxtLink>
           <NuxtLink to="/garage" class="btn" style="flex: 1 1 140px; justify-content: center;">Walk the Garage →</NuxtLink>
         </div>
+
+        <div v-if="rareWishlistItems.length > 0" style="margin-top: 28px;">
+          <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">★ On the Wishlist — Rare Finds</div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <NuxtLink
+              v-for="w in rareWishlistItems" :key="w.id" :to="`/wishlist/${w.id}`"
+              style="display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border: 1.5px dashed var(--orange-deep); text-decoration: none; color: inherit;"
+            >
+              <span style="font-family: var(--font-display); font-weight: 700; font-size: 15px;">{{ w.title }}</span>
+              <span v-if="w.estimatedPrice > 0" class="kicker" style="color: var(--muted); font-size: 11px;">{{ fmtMoney(w.estimatedPrice) }}</span>
+            </NuxtLink>
+          </div>
+        </div>
       </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { stats, fmtMoney, CAR_CATEGORIES, type Item } from '~/utils/catalog'
+import { stats, fmtMoney, isCar, isRareCarItem, CAR_CATEGORIES, type Item } from '~/utils/catalog'
 
 const { items, fetchAll } = useItems()
 const { wall, fetchWall } = useWall('garage')
+const { items: wishlistItems, fetchAll: fetchWishlistAll } = useWishlist()
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 
 try {
-  await Promise.all([fetchAll(), fetchWall()])
+  await Promise.all([fetchAll(), fetchWall(), fetchWishlistAll()])
 } catch (err) {
   console.warn('Failed to load items/wall for the Contents page:', err)
 }
 
 const s = computed(() => stats(items.value))
-const featured = computed(() => items.value.find((i) => i.featured) || items.value[0] || null)
+const carItems = computed(() => items.value.filter(isCar))
+const rareCarItems = computed(() => carItems.value.filter(isRareCarItem))
+const featured = computed(() => {
+  if (rareCarItems.value.length > 0) {
+    return rareCarItems.value[Math.floor(Math.random() * rareCarItems.value.length)]
+  }
+  return items.value.find((i) => i.featured) || items.value[0] || null
+})
+const rareWishlistItems = computed(() =>
+  wishlistItems.value.filter((w) => CAR_CATEGORIES.includes(w.category) && w.isRare),
+)
 const figures = computed(() => [
-  { n: s.value.total, label: 'Items Catalogued' },
+  { n: carItems.value.length, label: 'Total Cars' },
+  { n: wishlistItems.value.length, label: 'On the Wishlist' },
   { n: fmtMoney(s.value.value), label: 'Archive Value' },
   { n: s.value.gens, label: 'Generations Held' },
   { n: wall.value.cases.length, label: 'Display Cases' },
