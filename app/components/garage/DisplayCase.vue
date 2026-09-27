@@ -26,7 +26,7 @@
     <div class="case-frame" ref="frameRef" :style="{ overflowX: zoom != null && scale > fit + 0.001 ? 'auto' : 'hidden' }">
       <div :style="{ width: natW ? natW * scale + 'px' : undefined, height: natH ? natH * scale + 'px' : undefined, overflow: 'hidden' }">
         <div class="case-mat" ref="matRef" :style="{ transform: `scale(${scale})`, transformOrigin: 'top left', display: 'inline-block' }">
-          <div class="case-grid" :style="{ gridTemplateColumns: `repeat(${c.cols}, 150px)` }">
+          <div class="case-grid" :style="{ gridTemplateColumns: `repeat(${c.cols}, 150px)`, '--case-cols': c.cols }">
             <div
               v-for="i in cap" :key="i" class="slot"
               :class="{ empty: !slotItem(i - 1), dropinto: over === offset + i - 1, bumped: !!slotItem(i - 1) && bumped.has(slotItem(i - 1)!.id) }"

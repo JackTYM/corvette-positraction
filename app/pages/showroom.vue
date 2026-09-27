@@ -34,7 +34,7 @@
       @dragstart="(id) => (dragId = id)" @dragend="() => (dragId = null)"
     />
 
-    <div v-if="loose.length > 0" class="tray" style="margin-top: 8px;" @dragover.prevent @drop.prevent="onTrayDrop">
+    <div v-if="loose.length > 0" class="tray no-print" style="margin-top: 8px;" @dragover.prevent @drop.prevent="onTrayDrop">
       <div class="tray-head">
         <div>
           <div class="kicker" style="color: var(--muted); font-size: 10px;">Not on display</div>

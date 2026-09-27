@@ -43,7 +43,7 @@
       <section>
         <div class="kicker" style="color: var(--orange); margin-bottom: 12px;">The Holdings, By Era</div>
         <GenContents :items="items" @open="openItem" />
-        <div style="display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap;">
+        <div class="no-print" style="display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap;">
           <NuxtLink to="/collection" class="btn primary" style="flex: 1 1 180px; justify-content: center;">Browse the Collection →</NuxtLink>
           <NuxtLink to="/garage" class="btn" style="flex: 1 1 140px; justify-content: center;">Walk the Garage →</NuxtLink>
         </div>
