@@ -1,10 +1,14 @@
 <template>
   <nav class="no-print sec-tabs">
-    <div class="wrap tabs-scroll" style="display: flex; align-items: stretch; gap: 0;">
-      <NuxtLink v-for="t in tabs" :key="t.id" :to="t.to" class="mag-tab" :class="{ active: isActive(t.id) }">
-        <span class="mag-tab-sec">SEC. {{ t.num }}</span>
-        <span class="mag-tab-label">{{ t.label }}</span>
-      </NuxtLink>
+    <div class="wrap" style="display: flex; align-items: stretch; gap: 0;">
+      <div class="tabs-scroll-wrap">
+        <div class="tabs-scroll" style="display: flex; align-items: stretch; gap: 0;">
+          <NuxtLink v-for="t in tabs" :key="t.id" :to="t.to" class="mag-tab" :class="{ active: isActive(t.id) }">
+            <span class="mag-tab-sec">SEC. {{ t.num }}</span>
+            <span class="mag-tab-label">{{ t.label }}</span>
+          </NuxtLink>
+        </div>
+      </div>
       <NuxtLink to="/catalog" class="mag-tab mag-tab-catalog" :class="{ active: isActive('catalog') }">
         <span class="mag-tab-label">The Catalog</span>
       </NuxtLink>
