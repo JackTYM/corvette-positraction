@@ -10,6 +10,7 @@ export interface WishlistItemRow {
   notes: string | null
   img_key: string | null
   source_variant_id: string | null
+  is_rare: boolean
   created_at: string
   updated_at: string
 }
@@ -23,6 +24,7 @@ export interface WishlistItem {
   notes: string
   imgKey: string | null
   sourceVariantId: string | null
+  isRare: boolean
   createdAt: string
 }
 
@@ -36,6 +38,7 @@ export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
     notes: row.notes ?? '',
     imgKey: row.img_key,
     sourceVariantId: row.source_variant_id,
+    isRare: row.is_rare ?? false,
     createdAt: row.created_at,
   }
 }
@@ -49,6 +52,7 @@ export function wishlistToPatch(input: Partial<WishlistItem>): Record<string, un
   if (input.notes !== undefined) patch.notes = input.notes
   if (input.imgKey !== undefined) patch.img_key = input.imgKey
   if (input.sourceVariantId !== undefined) patch.source_variant_id = input.sourceVariantId
+  if (input.isRare !== undefined) patch.is_rare = input.isRare
   return patch
 }
 

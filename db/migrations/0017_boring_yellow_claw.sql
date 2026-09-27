@@ -1,0 +1,1 @@
+ALTER TABLE "wishlist_items" ADD COLUMN "is_rare" boolean DEFAULT false NOT NULL;

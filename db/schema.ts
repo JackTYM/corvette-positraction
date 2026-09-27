@@ -193,6 +193,7 @@ export const wishlistItems = pgTable(
     estimatedPrice: numeric('estimated_price', { precision: 12, scale: 2 }),
     sourceUrl: text('source_url'),
     notes: text('notes'),
+    isRare: boolean('is_rare').notNull().default(false),
     imgKey: text('img_key'),
     sourceVariantId: uuid('source_variant_id').references(() => diecastVariants.id, { onDelete: 'set null' }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

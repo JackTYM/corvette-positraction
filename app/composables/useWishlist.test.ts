@@ -4,7 +4,7 @@ import { fromWishlistRow, wishlistToPatch, type WishlistItemRow } from './useWis
 const row: WishlistItemRow = {
   id: 'wish-1', user_id: 'user-1', title: 'Corvette C8 1:18', estimated_price: '150.00',
   source_url: 'https://smalldiecastcorvettes.com/car/334_HW_CORVETTE_C7_Z06.html', notes: 'Waiting for a sale',
-  img_key: 'user-1/abc.jpg', source_variant_id: 'variant-1', category: 'TRACK CAR',
+  img_key: 'user-1/abc.jpg', source_variant_id: 'variant-1', category: 'TRACK CAR', is_rare: false,
   created_at: '2020-01-01T00:00:00Z', updated_at: '2020-01-01T00:00:00Z',
 }
 
@@ -14,7 +14,7 @@ describe('fromWishlistRow', () => {
       id: 'wish-1', title: 'Corvette C8 1:18', estimatedPrice: 150,
       sourceUrl: 'https://smalldiecastcorvettes.com/car/334_HW_CORVETTE_C7_Z06.html',
       notes: 'Waiting for a sale', imgKey: 'user-1/abc.jpg', sourceVariantId: 'variant-1',
-      category: 'TRACK CAR', createdAt: '2020-01-01T00:00:00Z',
+      category: 'TRACK CAR', isRare: false, createdAt: '2020-01-01T00:00:00Z',
     })
   })
   it('defaults null price/text fields for a manual entry with no source', () => {
@@ -29,6 +29,9 @@ describe('fromWishlistRow', () => {
   it('defaults a null category to DIECAST, for rows that predate the category column', () => {
     expect(fromWishlistRow({ ...row, category: null }).category).toBe('DIECAST')
   })
+  it('carries isRare through when true', () => {
+    expect(fromWishlistRow({ ...row, is_rare: true }).isRare).toBe(true)
+  })
 })
 
 describe('wishlistToPatch', () => {
@@ -40,5 +43,8 @@ describe('wishlistToPatch', () => {
   })
   it('maps category through when provided', () => {
     expect(wishlistToPatch({ category: 'DISPLAY MODELS' })).toEqual({ category: 'DISPLAY MODELS' })
+  })
+  it('maps isRare through when provided', () => {
+    expect(wishlistToPatch({ isRare: true })).toEqual({ is_rare: true })
   })
 })

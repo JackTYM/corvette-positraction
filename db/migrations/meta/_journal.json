@@ -120,6 +120,13 @@
       "when": 1790460274468,
       "tag": "0016_spotty_wither",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790474214623,
+      "tag": "0017_boring_yellow_claw",
+      "breakpoints": true
     }
   ]
 }

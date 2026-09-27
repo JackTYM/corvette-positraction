@@ -30,6 +30,10 @@
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Estimated Price ($)</span>
           <input v-model="estimatedPrice" type="number" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16px; width: 100%;" />
         </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input v-model="isRare" type="checkbox" />
+          <span class="kicker" style="color: var(--muted); font-size: 10px;">Rare / Treasure Hunt</span>
+        </label>
         <label style="display: block;">
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Source Link</span>
           <input v-model="sourceUrl" placeholder="https://…" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16px; width: 100%;" />
@@ -60,6 +64,7 @@ const previewUrl = ref<string | null>(null)
 const title = ref('')
 const collection = ref<Collection>('Diecast')
 const estimatedPrice = ref('')
+const isRare = ref(false)
 const sourceUrl = ref('')
 const notes = ref('')
 const saving = ref(false)
@@ -112,7 +117,7 @@ async function onSave() {
     }
     await create({
       title: title.value, category: COLLECTIONS[collection.value][0]!, estimatedPrice: Number(estimatedPrice.value) || 0,
-      sourceUrl: sourceUrl.value, notes: notes.value, imgKey, sourceVariantId: null,
+      isRare: isRare.value, sourceUrl: sourceUrl.value, notes: notes.value, imgKey, sourceVariantId: null,
     })
     emit('saved')
   } finally {
