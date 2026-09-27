@@ -396,6 +396,8 @@ export const CATEGORY_FIELDS: Record<Category, FieldDef[]> = {
   'HUBCAP': [],
 }
 
+// Keys off whatever checkbox fields the item's category happens to have — not restricted
+// to car categories, despite the name (which describes its intended use, on the Contents page).
 export function isRareCarItem(item: Item): boolean {
   return CATEGORY_FIELDS[item.category]
     .filter((f) => f.type === 'checkbox')

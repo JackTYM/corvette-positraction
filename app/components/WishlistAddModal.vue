@@ -30,9 +30,9 @@
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Estimated Price ($)</span>
           <input v-model="estimatedPrice" type="number" style="border-bottom: 1.5px solid var(--rule); padding: 5px 2px; font-size: 16px; width: 100%;" />
         </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input v-model="isRare" type="checkbox" />
-          <span class="kicker" style="color: var(--muted); font-size: 10px;">Rare / Treasure Hunt</span>
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <input v-model="isRare" type="checkbox" style="width: auto; flex-shrink: 0;" />
+          <span>Rare / Treasure Hunt</span>
         </label>
         <label style="display: block;">
           <span class="kicker" style="color: var(--muted); font-size: 10px; display: block; margin-bottom: 3px;">Source Link</span>

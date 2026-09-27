@@ -341,6 +341,10 @@ describe('isRareCarItem', () => {
   it('is true for a different checkbox on the same category', () => {
     expect(isRareCarItem(item({ category: 'DIECAST', attributes: { errorCar: true } }))).toBe(true)
   })
+  it('is true for Track Car and Display Models too, not just Diecast', () => {
+    expect(isRareCarItem(item({ category: 'TRACK CAR', attributes: { treasureHunt: true } }))).toBe(true)
+    expect(isRareCarItem(item({ category: 'DISPLAY MODELS', attributes: { treasureHunt: true } }))).toBe(true)
+  })
   it('ignores a checkbox explicitly set to false', () => {
     expect(isRareCarItem(item({ category: 'DIECAST', attributes: { treasureHunt: false } }))).toBe(false)
   })

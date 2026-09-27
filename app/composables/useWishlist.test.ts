@@ -47,4 +47,7 @@ describe('wishlistToPatch', () => {
   it('maps isRare through when provided', () => {
     expect(wishlistToPatch({ isRare: true })).toEqual({ is_rare: true })
   })
+  it('maps isRare through when explicitly false, not treated as "not provided"', () => {
+    expect(wishlistToPatch({ isRare: false })).toEqual({ is_rare: false })
+  })
 })

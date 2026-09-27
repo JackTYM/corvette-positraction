@@ -38,7 +38,7 @@ export function fromWishlistRow(row: WishlistItemRow): WishlistItem {
     notes: row.notes ?? '',
     imgKey: row.img_key,
     sourceVariantId: row.source_variant_id,
-    isRare: row.is_rare ?? false,
+    isRare: row.is_rare,
     createdAt: row.created_at,
   }
 }
