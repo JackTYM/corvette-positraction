@@ -339,6 +339,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
   transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 .editorial-card:hover { transform: translateY(-3px); box-shadow: 0 1px 0 rgba(28,24,20,0.06), 0 26px 40px -22px rgba(28,24,20,0.7); }
+.editorial-card.wishlist { border: 3px dashed var(--orange-deep); }
 .editorial-card-photo { position: relative; border-bottom: 2px solid var(--ink); background: #17120d; aspect-ratio: var(--photo-ratio); overflow: hidden; }
 .editorial-card-img { width: 100%; height: 100%; object-fit: contain; }
 .editorial-card-placeholder {

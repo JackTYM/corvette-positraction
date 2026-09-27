@@ -1,9 +1,15 @@
 <template>
   <div class="wrap" style="padding: 20px 26px 70px;">
     <div class="kicker" style="color: var(--orange); margin-bottom: 6px;">Section Three</div>
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; gap: 14px;">
       <h2 style="font-size: clamp(30px, 4.5vw, 44px); line-height: 0.95;">Wishlist</h2>
-      <button class="btn primary no-print" @click="showModal = true">+ Add to Wishlist</button>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div v-if="totalCost > 0" style="text-align: right;">
+          <div class="kicker" style="color: var(--muted); font-size: 10px;">Total Expected Cost</div>
+          <div style="font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--orange);">{{ fmtMoney(totalCost) }}</div>
+        </div>
+        <button class="btn primary no-print" @click="showModal = true">+ Add to Wishlist</button>
+      </div>
     </div>
 
     <div v-if="items.length > 1" class="no-print" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px;">
@@ -53,4 +59,5 @@ const activeSort = ref<keyof typeof ARRANGE_LABELS>('entered')
 const sortedItems = computed(() =>
   [...items.value].sort((a, b) => ARRANGE[activeSort.value](wishlistItemAsCard(a), wishlistItemAsCard(b))),
 )
+const totalCost = computed(() => items.value.reduce((sum, w) => sum + w.estimatedPrice, 0))
 </script>
