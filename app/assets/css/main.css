@@ -206,19 +206,12 @@ input:focus, textarea:focus, select:focus { outline: none; }
   border: 1px solid var(--rule-soft); background: var(--paper-2);
   transition: outline-color 0.1s, background 0.1s;
 }
-.slot-num {
-  position: absolute; top: 3px; right: 5px; z-index: 3;
-  font-family: var(--font-cond); font-size: 10px; letter-spacing: 0.1em;
-  color: var(--muted); opacity: 0.75; pointer-events: none;
-}
 .slot-code {
-  position: absolute; bottom: 3px; left: 5px; z-index: 3;
-  font-family: var(--font-cond); font-size: 9px; letter-spacing: 0.06em;
-  color: var(--muted); opacity: 0.65; pointer-events: none; transition: opacity 0.14s ease;
+  position: absolute; top: 4px; right: 5px; z-index: 3;
+  font-family: var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 0.04em;
+  color: var(--orange); background: var(--ink); border: 1px solid var(--orange);
+  padding: 2px 6px; pointer-events: none;
 }
-/* The hover veil's title/meta text lands in this same bottom-left corner -- fade the
-   location code out while it's showing so the two don't visually mix. */
-.slot:has(.slot-car:hover) .slot-code { opacity: 0; }
 .case-name { cursor: pointer; }
 .case-name:hover { text-decoration: underline; text-decoration-color: var(--orange); }
 .slot.empty {
@@ -247,6 +240,13 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .slot-car.wishlist { border: 3px dashed var(--orange-deep); }
 .slot-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
 .slot-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 5px; z-index: 2; border-right: 1px solid rgba(0,0,0,0.5); }
+.slot-wishlist-ribbon {
+  position: absolute; bottom: 4px; left: 0; z-index: 5;
+  background: var(--orange-deep); color: var(--paper);
+  font-family: var(--font-cond); font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 3px 8px 3px 6px; pointer-events: none;
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+}
 .slot-veil {
   position: absolute; inset: 0; z-index: 3; display: flex; align-items: flex-end;
   background: linear-gradient(0deg, rgba(15,12,9,0.92) 0%, rgba(15,12,9,0.55) 46%, rgba(15,12,9,0) 82%);
@@ -254,11 +254,8 @@ input:focus, textarea:focus, select:focus { outline: none; }
 }
 .slot-car:hover .slot-veil { opacity: 1; }
 .slot-body { padding: 6px 8px 6px 9px; min-width: 0; width: 100%; display: flex; flex-direction: column; gap: 2px; }
-.slot-title {
-  font-family: var(--font-display); font-weight: 800; font-size: 12px; line-height: 1.02; color: var(--paper);
-  overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-}
 .slot-meta { font-family: var(--font-cond); text-transform: uppercase; letter-spacing: 0.07em; font-size: 9px; color: rgba(245,240,232,0.72); display: flex; gap: 6px; align-items: center; }
+.slot-car.wishlist .slot-meta { padding-left: 44px; }
 .slot-eject {
   position: absolute; top: 3px; left: 5px; z-index: 5;
   width: 16px; height: 16px; line-height: 1; font-size: 9px; padding: 0;

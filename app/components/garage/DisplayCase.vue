@@ -33,7 +33,6 @@
               @dragover.prevent="onDragOver(offset + i - 1)" @dragleave="onDragLeave(offset + i - 1)"
               @drop.prevent="onDrop(offset + i - 1)" @click="!slotItem(i - 1) && $emit('emptySlot', offset + i - 1)"
             >
-              <span class="slot-num">{{ String(i).padStart(2, '0') }}</span>
               <span class="slot-code">{{ slotCode(index, i - 1, c.cols) }}</span>
               <SlotCar
                 v-if="slotItem(i - 1)" :item="slotItem(i - 1)!" :dragging="dragId === slotItem(i - 1)!.id"

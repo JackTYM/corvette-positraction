@@ -7,10 +7,9 @@
     <img v-if="item.imgKey" class="slot-photo" :src="`${imageBaseUrl}/${item.imgKey}`" :alt="item.title" draggable="false" />
     <div v-else class="slot-photo" style="background: var(--paper-2);" />
     <div class="slot-spine" :style="{ background: colorOf(item).hex }" />
-    <div v-if="!item.owned" style="position: absolute; top: 3px; right: 5px; z-index: 5; background: var(--ink); color: var(--paper); font-size: 8px; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 5px; font-family: var(--font-cond);">Wishlist</div>
+    <div v-if="!item.owned" class="slot-wishlist-ribbon">Wishlist</div>
     <div class="slot-veil">
       <div class="slot-body">
-        <div class="slot-title">{{ item.title }}</div>
         <div class="slot-meta">
           <span>{{ item.generation === '—' ? 'EPH' : item.generation }}</span><span>·</span><span>{{ item.year || '—' }}</span>
           <span style="margin-left: auto; color: var(--orange); font-weight: 700;">{{ fmtMoney(item.value) }}</span>
