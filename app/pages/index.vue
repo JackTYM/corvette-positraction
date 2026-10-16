@@ -25,14 +25,13 @@
         <div class="kicker" style="color: var(--orange); margin-bottom: 12px;">★ The Featured Find</div>
         <div class="featured-card" @click="openItem(featured)">
           <div class="featured-photo photo-frame">
-            <img v-if="featured.imgKey" :src="`${imageBaseUrl}/${featured.imgKey}`" :alt="featured.title" class="featured-img" />
-            <div v-else class="editorial-card-placeholder">No photo yet</div>
+            <img :src="`${imageBaseUrl}/${featured.imgKey}`" :alt="featured.title" class="featured-img" />
             <div class="halftone-dots" style="position: absolute; inset: 0; color: var(--ink); opacity: calc(var(--halftone) * 0.28); pointer-events: none; mix-blend-mode: multiply;" />
             <div style="position: absolute; top: 16px; left: 16px;"><Stamp :category="featured.category" /></div>
             <div class="featured-value"><ValueNote :value="featured.value" :size="44" /></div>
           </div>
           <div style="padding: 18px 20px 20px;">
-            <div class="kicker" style="color: var(--orange); margin-bottom: 7px;">{{ CAR_CATEGORIES.includes(featured.category) ? `${featured.year} · ${featured.generation} · ${featured.maker}` : `${featured.year} · ${featured.generation}` }}</div>
+            <div class="kicker" style="color: var(--orange); margin-bottom: 7px;">{{ `${featured.year} · ${featured.generation} · ${featured.maker}` }}</div>
             <h3 style="font-size: 34px; line-height: 0.95; margin-bottom: 8px;">{{ featured.title }}</h3>
             <p style="font-size: 16px; line-height: 1.5; color: var(--ink-soft); margin: 0;">{{ featured.story }}</p>
             <div class="btn ghost" style="margin-top: 16px; border-color: var(--ink); pointer-events: none;">Read the full entry →</div>
@@ -41,9 +40,7 @@
       </section>
 
       <section>
-        <div class="kicker" style="color: var(--orange); margin-bottom: 12px;">The Holdings, By Era</div>
-        <GenContents :items="items" @open="openItem" />
-        <div class="no-print" style="display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap;">
+        <div class="no-print" style="display: flex; gap: 10px; flex-wrap: wrap;">
           <NuxtLink to="/collection" class="btn primary" style="flex: 1 1 180px; justify-content: center;">Browse the Collection →</NuxtLink>
           <NuxtLink to="/garage" class="btn" style="flex: 1 1 140px; justify-content: center;">Walk the Garage →</NuxtLink>
         </div>
@@ -82,13 +79,10 @@ try {
 
 const s = computed(() => stats(items.value))
 const carItems = computed(() => items.value.filter(isCar))
-const rareCarItems = computed(() => carItems.value.filter(isRareCarItem))
-const featured = computed(() => {
-  if (rareCarItems.value.length > 0) {
-    return rareCarItems.value[Math.floor(Math.random() * rareCarItems.value.length)]
-  }
-  return items.value.find((i) => i.featured) || items.value[0] || null
-})
+const rareCarItems = computed(() => carItems.value.filter((i) => isRareCarItem(i) && i.imgKey))
+const featured = computed(() =>
+  rareCarItems.value.length > 0 ? rareCarItems.value[Math.floor(Math.random() * rareCarItems.value.length)] : null,
+)
 const rareWishlistItems = computed(() =>
   wishlistItems.value.filter((w) => CAR_CATEGORIES.includes(w.category) && w.isRare),
 )
