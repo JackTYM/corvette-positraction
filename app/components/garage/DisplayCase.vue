@@ -2,8 +2,7 @@
   <div class="case">
     <div class="case-head">
       <div style="min-width: 180px;">
-        <div class="kicker" style="color: var(--muted); font-size: 10px; margin-bottom: 3px;">Case {{ caseLetter(index) }}</div>
-        <h3 class="case-name" style="font-size: 26px; line-height: 0.95;" title="Rename this case" @click="$emit('edit', index)">{{ c.name }}</h3>
+        <div class="kicker" style="color: var(--muted); font-size: 10px;">Case {{ caseLetter(index) }}</div>
       </div>
       <div class="case-specs">
         <div><span class="case-k">Frame</span><span class="case-v">{{ c.cols }} × {{ c.rows }}</span></div>
