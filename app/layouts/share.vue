@@ -1,8 +1,8 @@
 <template>
-  <div class="screen-only">
+  <div>
     <Masthead minimal />
     <slot />
-    <footer style="border-top: 3px solid var(--ink); margin-top: 30px;">
+    <footer class="no-print" style="border-top: 3px solid var(--ink); margin-top: 30px;">
       <HalftoneBand color="var(--ink)" :height="8" opacity="calc(var(--halftone) * 0.5)" />
       <div class="wrap" style="padding: 22px 26px 30px; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px;">
         <span style="font-family: var(--font-display); font-weight: 800; font-size: 18px;">CORVETTE <span style="color: var(--orange);">POSITRACTION</span></span>

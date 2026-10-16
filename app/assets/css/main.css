@@ -307,8 +307,6 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .pick-row:hover { background: var(--paper-2); }
 .pick-row.wishlist { border-left: 3px dashed var(--orange-deep); }
 
-.print-only { display: none; }
-
 @media (max-width: 860px) {
   .toc-grid, .detail-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
   .card-grid { grid-template-columns: 1fr 1fr !important; }
@@ -322,14 +320,17 @@ input:focus, textarea:focus, select:focus { outline: none; }
   @page { margin: 14mm; }
   body::before, body::after { display: none; }
   body { background: #fff; }
-  .screen-only { display: none !important; }
-  .print-only { display: block !important; }
   .no-print { display: none !important; }
-  .case-frame { overflow: visible !important; }
+  /* Browsers skip backgrounds when printing by default, so anything light-on-dark is restyled dark-on-white. */
+  .case-frame { overflow: visible !important; background: #fff !important; box-shadow: none !important; border: 2px solid #000; padding: 6px; }
   .case-frame > div { width: auto !important; height: auto !important; }
-  .case-mat { transform: none !important; }
+  .case-mat { display: block !important; width: 100% !important; transform: none !important; background: #fff !important; box-shadow: none !important; border: 0; padding: 0; }
   .case-grid { grid-template-columns: repeat(var(--case-cols), minmax(0, 1fr)) !important; }
-  .case-grid .slot { min-width: 0 !important; }
+  .case-grid .slot { min-width: 0 !important; break-inside: avoid; background: #fff !important; border: 1px solid #888; }
+  .slot-car { background: #fff !important; }
+  .slot-code { background: #fff !important; color: #000 !important; border-color: #000 !important; }
+  .slot-wishlist-ribbon { background: #fff !important; color: #000 !important; border: 1px solid #000; clip-path: none; }
+  .detail-value-banner { background: #fff !important; color: #000 !important; border: 2px solid #000; }
 }
 
 .sec-tabs { background: var(--paper); border-bottom: 3px solid var(--ink); position: sticky; top: 0; z-index: 50; }

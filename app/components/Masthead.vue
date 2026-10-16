@@ -1,5 +1,5 @@
 <template>
-  <header style="background: var(--ink); color: var(--paper);">
+  <header class="no-print" style="background: var(--ink); color: var(--paper);">
     <HalftoneBand color="var(--orange)" :height="16" :opacity="0.9" />
     <div class="wrap" style="padding: 16px 26px 14px;">
       <div class="kicker" style="color: var(--orange); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline;">
