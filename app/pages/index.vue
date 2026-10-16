@@ -79,10 +79,12 @@ try {
 
 const s = computed(() => stats(items.value))
 const carItems = computed(() => items.value.filter(isCar))
-const rareCarItems = computed(() => carItems.value.filter((i) => isRareCarItem(i) && i.imgKey))
-const featured = computed(() =>
-  rareCarItems.value.length > 0 ? rareCarItems.value[Math.floor(Math.random() * rareCarItems.value.length)] : null,
-)
+const photoCarItems = computed(() => carItems.value.filter((i) => i.imgKey))
+const featured = computed(() => {
+  const rare = photoCarItems.value.filter(isRareCarItem)
+  const pool = rare.length > 0 ? rare : photoCarItems.value
+  return pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null
+})
 const rareWishlistItems = computed(() =>
   wishlistItems.value.filter((w) => CAR_CATEGORIES.includes(w.category) && w.isRare),
 )
