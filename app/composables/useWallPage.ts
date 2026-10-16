@@ -61,8 +61,18 @@ export async function useWallPage(kind: WallKind, categories: Category[]) {
     const start = offsets.value[ci], cap = caps.value[ci]
     await setOrder([...order.value.slice(0, start), ...order.value.slice(start + cap)])
   }
+  // An in-app dialog rather than window.confirm: some browsers/webviews suppress or auto-cancel native popups.
+  const pendingConfirm = ref<{ title: string; message: string; confirmLabel: string; run: () => Promise<void> } | null>(null)
+  async function acceptConfirm() {
+    const pending = pendingConfirm.value
+    pendingConfirm.value = null
+    if (pending) await pending.run()
+  }
   function confirmEmptyWall() {
-    if (window.confirm('Clear every case? Cars stay in your collection.')) setOrder([])
+    pendingConfirm.value = {
+      title: 'Clear The Wall', message: 'Clear every case? Cars stay in your collection.', confirmLabel: 'Clear',
+      run: () => setOrder([]),
+    }
   }
   function onTrayDrop() {
     if (dragId.value) eject(dragId.value)
@@ -77,9 +87,13 @@ export async function useWallPage(kind: WallKind, categories: Category[]) {
     await setCases(cases.value.map((c, i) => (i === ci ? { ...c, ...v } : c)))
     formState.value = null
   }
-  async function removeCase(ci: number) {
-    if (!window.confirm('Take this case off the wall? The cars stay in your collection and shift into the remaining cases.')) return
-    await setCases(cases.value.filter((_, i) => i !== ci))
+  function removeCase(ci: number) {
+    pendingConfirm.value = {
+      title: 'Remove This Case',
+      message: 'Take this case off the wall? The cars stay in your collection and shift into the remaining cases.',
+      confirmLabel: 'Remove',
+      run: () => setCases(cases.value.filter((_, i) => i !== ci)),
+    }
   }
 
   const pickSeq = ref<number | null>(null)
@@ -93,5 +107,6 @@ export async function useWallPage(kind: WallKind, categories: Category[]) {
     dragId, bumped, formState, pickSeq,
     moveTo, eject, emptyCase, confirmEmptyWall, onTrayDrop,
     addCase, editCase, removeCase, openItem,
+    pendingConfirm, acceptConfirm,
   }
 }

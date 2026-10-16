@@ -48,6 +48,7 @@
 
     <CaseForm v-if="formState?.add" @save="addCase" @cancel="formState = null" />
     <CaseForm v-else-if="formState?.editIndex != null" :initial="cases[formState.editIndex]" @save="(v) => editCase(formState!.editIndex!, v)" @cancel="formState = null" />
+    <ConfirmModal v-if="pendingConfirm" :title="pendingConfirm.title" :message="pendingConfirm.message" :confirm-label="pendingConfirm.confirmLabel" @confirm="acceptConfirm" @cancel="pendingConfirm = null" />
     <SlotPicker v-if="pickSeq != null" :candidates="loose" @close="pickSeq = null" @pick="(id) => { moveTo(id, pickSeq!); pickSeq = null }" />
   </div>
 </template>
@@ -59,6 +60,6 @@ const {
   cases, order, byId, offsets, caps, overflow, loose,
   dragId, bumped, formState, pickSeq,
   moveTo, eject, emptyCase, confirmEmptyWall, onTrayDrop,
-  addCase, editCase, removeCase, openItem,
+  addCase, editCase, removeCase, openItem, pendingConfirm, acceptConfirm,
 } = await useWallPage('showroom', SHOWROOM_CATEGORIES)
 </script>
