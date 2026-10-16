@@ -4,7 +4,7 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; gap: 14px;">
       <h2 style="font-size: clamp(30px, 4.5vw, 44px); line-height: 0.95;">Wishlist</h2>
       <div style="display: flex; align-items: center; gap: 16px;">
-        <div v-if="totalCost > 0" style="text-align: right;">
+        <div style="text-align: right;">
           <div class="kicker" style="color: var(--muted); font-size: 10px;">Total Expected Cost</div>
           <div style="font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--orange);">{{ fmtMoney(totalCost) }}</div>
         </div>

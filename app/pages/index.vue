@@ -40,22 +40,27 @@
       </section>
 
       <section>
-        <div class="no-print" style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <template v-if="rareWishlistFeatured">
+          <div class="kicker" style="color: var(--orange); margin-bottom: 12px;">★ On the Wishlist — A Rare Find</div>
+          <div class="featured-card" style="border: 3px dashed var(--orange-deep);" @click="navigateTo(`/wishlist/${rareWishlistFeatured.id}`)">
+            <div class="featured-photo photo-frame">
+              <img :src="`${imageBaseUrl}/${rareWishlistFeatured.imgKey}`" :alt="rareWishlistFeatured.title" class="featured-img" />
+              <div class="halftone-dots" style="position: absolute; inset: 0; color: var(--ink); opacity: calc(var(--halftone) * 0.28); pointer-events: none; mix-blend-mode: multiply;" />
+              <div style="position: absolute; top: 16px; left: 16px;"><Stamp :category="rareWishlistFeatured.category" /></div>
+              <div v-if="rareWishlistFeatured.estimatedPrice > 0" class="featured-value"><ValueNote :value="rareWishlistFeatured.estimatedPrice" :size="44" /></div>
+            </div>
+            <div style="padding: 18px 20px 20px;">
+              <div class="kicker" style="color: var(--orange); margin-bottom: 7px;">Wishlist · Rare</div>
+              <h3 style="font-size: 34px; line-height: 0.95; margin-bottom: 8px;">{{ rareWishlistFeatured.title }}</h3>
+              <p v-if="rareWishlistFeatured.notes" style="font-size: 16px; line-height: 1.5; color: var(--ink-soft); margin: 0;">{{ rareWishlistFeatured.notes }}</p>
+              <div class="btn ghost" style="margin-top: 16px; border-color: var(--ink); pointer-events: none;">See the wishlist entry →</div>
+            </div>
+          </div>
+        </template>
+
+        <div class="no-print" :style="{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: rareWishlistFeatured ? '22px' : '0' }">
           <NuxtLink to="/collection" class="btn primary" style="flex: 1 1 180px; justify-content: center;">Browse the Collection →</NuxtLink>
           <NuxtLink to="/garage" class="btn" style="flex: 1 1 140px; justify-content: center;">Walk the Garage →</NuxtLink>
-        </div>
-
-        <div v-if="rareWishlistItems.length > 0" style="margin-top: 28px;">
-          <div class="kicker" style="color: var(--orange); margin-bottom: 10px;">★ On the Wishlist — Rare Finds</div>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <NuxtLink
-              v-for="w in rareWishlistItems" :key="w.id" :to="`/wishlist/${w.id}`"
-              style="display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border: 1.5px dashed var(--orange-deep); text-decoration: none; color: inherit;"
-            >
-              <span style="font-family: var(--font-display); font-weight: 700; font-size: 15px;">{{ w.title }}</span>
-              <span v-if="w.estimatedPrice > 0" class="kicker" style="color: var(--muted); font-size: 11px;">{{ fmtMoney(w.estimatedPrice) }}</span>
-            </NuxtLink>
-          </div>
         </div>
       </section>
     </div>
@@ -66,13 +71,14 @@
 import { stats, fmtMoney, isCar, isRareCarItem, CAR_CATEGORIES, type Item } from '~/utils/catalog'
 
 const { items, fetchAll } = useItems()
-const { wall, fetchWall } = useWall('garage')
+const { wall: garageWall, fetchWall: fetchGarageWall } = useWall('garage')
+const { wall: showroomWall, fetchWall: fetchShowroomWall } = useWall('showroom')
 const { items: wishlistItems, fetchAll: fetchWishlistAll } = useWishlist()
 const cfg = useRuntimeConfig()
 const imageBaseUrl = cfg.public.imageBaseUrl
 
 try {
-  await Promise.all([fetchAll(), fetchWall(), fetchWishlistAll()])
+  await Promise.all([fetchAll(), fetchGarageWall(), fetchShowroomWall(), fetchWishlistAll()])
 } catch (err) {
   console.warn('Failed to load items/wall for the Contents page:', err)
 }
@@ -85,16 +91,21 @@ const featured = computed(() => {
   const pool = rare.length > 0 ? rare : photoCarItems.value
   return pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null
 })
-const rareWishlistItems = computed(() =>
-  wishlistItems.value.filter((w) => CAR_CATEGORIES.includes(w.category) && w.isRare),
-)
+const rareWishlistFeatured = computed(() => {
+  const pool = wishlistItems.value.filter((w) => CAR_CATEGORIES.includes(w.category) && w.isRare && w.imgKey)
+  return pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null
+})
+const yearsSpanned = computed(() => {
+  if (!s.value.total) return '—'
+  return s.value.earliest === s.value.latest ? String(s.value.earliest) : `${s.value.earliest}–${String(s.value.latest).slice(2)}`
+})
 const figures = computed(() => [
   { n: carItems.value.length, label: 'Total Cars' },
   { n: wishlistItems.value.length, label: 'On the Wishlist' },
   { n: fmtMoney(s.value.value), label: 'Archive Value' },
   { n: s.value.gens, label: 'Generations Held' },
-  { n: wall.value.cases.length, label: 'Display Cases' },
-  { n: s.value.total ? `${s.value.earliest}–${String(s.value.latest).slice(2)}` : '—', label: 'Years Spanned' },
+  { n: garageWall.value.cases.length + showroomWall.value.cases.length, label: 'Display Cases' },
+  { n: yearsSpanned.value, label: 'Years Spanned' },
 ])
 
 function openItem(item: Item) {
